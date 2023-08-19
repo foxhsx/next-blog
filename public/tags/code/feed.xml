@@ -1,0 +1,34 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Coder 小站</title>
+      <link>https://blog.ihsxu.com/blog</link>
+      <description>三金的个人博客，记录学习、成长和一些偶尔冒得泡</description>
+      <language>en-us</language>
+      <managingEditor>undefined (三金)</managingEditor>
+      <webMaster>undefined (三金)</webMaster>
+      <lastBuildDate>Tue, 08 Mar 2016 00:00:00 GMT</lastBuildDate>
+      <atom:link href="https://blog.ihsxu.com/tags/code/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://blog.ihsxu.com/blog/code-sample</guid>
+    <title>Sample .md file</title>
+    <link>https://blog.ihsxu.com/blog/code-sample</link>
+    <description>Example of a markdown file with code blocks and syntax highlighting</description>
+    <pubDate>Tue, 08 Mar 2016 00:00:00 GMT</pubDate>
+    <author>undefined (三金)</author>
+    <category>markdown</category><category>code</category><category>features</category>
+  </item>
+
+  <item>
+    <guid>https://blog.ihsxu.com/blog/hello</guid>
+    <title>Hello Next 测试</title>
+    <link>https://blog.ihsxu.com/blog/hello</link>
+    <description>Example of a markdown file with code blocks and syntax highlighting</description>
+    <pubDate>Wed, 02 Aug 2023 16:00:00 GMT</pubDate>
+    <author>undefined (三金)</author>
+    <category>markdown</category><category>code</category><category>features</category>
+  </item>
+
+    </channel>
+  </rss>

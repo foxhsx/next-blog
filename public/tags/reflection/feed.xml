@@ -1,0 +1,24 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Coder 小站</title>
+      <link>https://blog.ihsxu.com/blog</link>
+      <description>三金的个人博客，记录学习、成长和一些偶尔冒得泡</description>
+      <language>en-us</language>
+      <managingEditor>undefined (三金)</managingEditor>
+      <webMaster>undefined (三金)</webMaster>
+      <lastBuildDate>Wed, 15 Aug 2018 00:00:00 GMT</lastBuildDate>
+      <atom:link href="https://blog.ihsxu.com/tags/reflection/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://blog.ihsxu.com/blog/the-time-machine</guid>
+    <title>The Time Machine</title>
+    <link>https://blog.ihsxu.com/blog/the-time-machine</link>
+    <description>The Time Traveller (for so it will be convenient to speak of him) was expounding a recondite matter to us. His pale grey eyes shone and twinkled, and his usually pale face was flushed and animated...</description>
+    <pubDate>Wed, 15 Aug 2018 00:00:00 GMT</pubDate>
+    <author>undefined (三金)</author>
+    <category>writings</category><category>book</category><category>reflection</category>
+  </item>
+
+    </channel>
+  </rss>
