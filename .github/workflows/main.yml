@@ -54,4 +54,7 @@ jobs:
           script: |
             cd /var/www/md-note/
             wget https://github.com/foxhsx/next-blog/releases/latest/download/release.tgz -O release.tgz
-            tar zxvf release.tgz
+            sudo tar zxvf release.tgz
+            sudo rm -f release.tgz
+            sudo rm -r blog
+            sudo mv out blog
