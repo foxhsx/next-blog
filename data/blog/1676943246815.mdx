@@ -1,0 +1,441 @@
+---
+title: 36-omit.js
+date: 8/21/2023
+tags: [源码,开源]
+draft: false
+summary: 源码共读笔记，omit.js
+---
+
+### Github 仓库地址
+
+*   github1s: <https://github1s.com/benjycui/omit.js>
+*   github: <https://github.com/benjycui/omit.js>
+
+### 参考文章
+
+*   [若川说"可能是历史上最简单的一期omit.js"源码共读,但我学到了这些](https://juejin.cn/post/7119702439355220004 "https://juejin.cn/post/7119702439355220004")
+    *   参考原因：分析了源码中的依赖、使用 jest 重写测试代码，并使用 TS 重构
+*   [源码学习-omit.js库【移除对象中的属性】](https://juejin.cn/post/7144644388574986277/)
+    *   参考原因：从各个角度分析学习源码实现，比较详细
+*   [源码共读，第36期 | omit.js 剔除对象中的属性](https://juejin.cn/post/7199567427377184827)
+    *   参考原因：没有写代码，只讲述了学到了什么，简单明了
+*   [【若川视野 x 源码共读】第36期 | omit.js 剔除对象中的属性](https://juejin.cn/post/7170202368045219876)
+    *   参考原因：使用 TS 实现，且用 vitest 重写了单元测试
+*   [【源码学习】omitjs源码学习](https://juejin.cn/post/7173300700846227487)
+    *   参考原因：有脑图
+
+### 选学
+
+其他一些方法库中也是一样的方法的。比如：
+
+*   TS 中有 Omit 内置方法：[zhuanlan.zhihu.com/p/397398407](https://link.juejin.cn?target=https%3A%2F%2Fzhuanlan.zhihu.com%2Fp%2F397398407 "https://zhuanlan.zhihu.com/p/397398407")
+*   underscore.js 也有这个方法：<https://underscorejs.org/docs/modules/omit.html>
+*   lodash 也有 omit 方法：[docs-lodash.com/v4/omit/](https://link.juejin.cn?target=https%3A%2F%2Fdocs-lodash.com%2Fv4%2Fomit%2F "https://docs-lodash.com/v4/omit/")
+
+### 源码目录
+
+```bash
+|____LICENSE
+|____tests
+| |____index.test.js
+|____index.js
+|____README.md
+|____yarn.lock
+|____.gitignore
+|____package.json
+|____.fatherrc.js
+|____.eslintrc.js
+|____.eslintignore
+|____index.d.ts
+|____.travis.yml
+|____src
+| |____index.js
+```
+
+*   tests：测试代码目录
+*   index.js：入口文件
+*   src：源代码
+*   package.json：项目依赖、启动打包命令
+*   .fatherrc.js：father 库的配置
+*   .eslintrc.js：eslint 的配置
+*   .eslintignore.js：eslint 的忽略配置
+*   index.d.ts：omit 的类型声明文件
+*   .travis.yml：是 github 用于说明持续集成步骤配置文件
+
+### package.json
+
+```json
+{
+  "name": "omit.js",
+  "version": "2.0.2",
+  "description": "Utility function to create a shallow copy of an object which had dropped some fields.",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "types": "index.d.ts",
+  "files": [
+    "lib",
+    "es",
+    "dist",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "start": "father doc dev --storybook",
+    "build": "father doc build --storybook",
+    "compile": "father build",
+    "gh-pages": "father doc deploy",
+    "prepublishOnly": "npm run compile && np --yolo --no-publish",
+    "lint": "eslint .",
+    "test": "father test",
+    "coverage": "father test --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjycui/omit.js.git"
+  },
+  "keywords": [
+    "object",
+    "omit"
+  ],
+  "author": "Benjy Cui<benjytrys@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/benjycui/omit.js/issues"
+  },
+  "homepage": "https://github.com/benjycui/omit.js#readme",
+  "devDependencies": {
+    "@umijs/fabric": "^2.2.2",
+    "assert": "^1.4.1",
+    "eslint": "^7.4.0",
+    "father": "^2.29.5",
+    "np": "^6.3.1",
+    "rc-tools": "^6.3.3"
+  }
+}
+
+```
+
+*   main：项目的主入口文件。即当其他模块引用该模块时，Node.js 会加载该文件作为该模块的默认导出内容；如果该属性值没有设置，默认为项目根目录下的 `index.js` 文件；
+*   module：在 `package.json` 中，这是一个可选字段。用于指定 ES Module 规范的入口文件。它是为了解决在 Node.js 中使用 ES Module 的问题而提出的。我们知道，在 Node.js 中默认使用 CommonJS 规范，而如果想要在 Node.js 中使用 ES Module，还是需要一些手段来做支撑的。而当一个模块在同时支持 CommonJS 和 ES Module 规范时，就需要在 `package.json` 中同时定义 `main` 和 `module` 字段，很显然，`omit.js` 是同时支持这两种规范的。在打包时如果打包工具支持该字段，则会优先使用 ES6 模块规范的版本，这样可以启用 Tree Shaking 的机制，如果不支持就会走 main 字段，这个时候会使用 CommonJS 规范的版本
+*   types：它也是一个可选字段，用于指定 TS 模块的类型定义文件。当其他的 TS 模块导入该模块时，TS 编译器会查找该模块的类型定义文件并使用它来验证导入的模块。而它也是 npm 包的声明文件，使用此字段，会将类型声明文件和 npm 包捆绑在一起
+*   files：也是一个可选字段，用于指定 npm 包作为依赖被安装时要包括的文件，格式时文件正则的数组。默认情况下，npm 包会包含 `package.json` 和 `README.md` 文件以及模块主入口文件（如果 `main` 字段存在），但不会包含其他文件和目录。该字段中的路径应该对应项目根目录
+*   scripts：项目中可执行的命令
+
+    *   start：`father doc dev --storybook`
+        *   启动一个本地开发环境下的文档
+
+    ![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded224.webp)
+
+    *   build：`father doc build --storybook`
+        *   打包 `.doc` 目录，其实还是文档
+
+    ![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded225.webp)
+
+    *   compile：`father build`
+        *   正儿八经构建该包，生成 `esm` 和 `lib`目录
+
+    ![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded226.webp)
+
+    *   gh-pages：`father doc deploy`
+        *   将文档部署到 github
+        *   这个命令是 `father-doc` 工具的一个子命令，它的作用是将生成的文档网站部署到远程服务器或者静态文件托管服务器。而要该命令能生效需要在 `package.json`里再配置一番：
+
+```json
+{
+  "father-doc": {
+    // config 指定 father-doc 生成的文档网站目录，下面配置指定生成的文档网站输出到 docs 目录中
+    "config": {
+      "outputPath": "docs"
+    },
+    // deploy 选项指定部署选项
+    "deploy": {
+      "type": "ftp",  // 使用 ftp 协议将生成的文档网站部署到服务器上
+      "host": "ftp.example.com",
+      "username": "user",
+      "password": "password",
+      "path": "/public_html/docs"
+    }
+  }
+}
+```
+
+*   republishOnly：`npm run compile && np --yolo --no-publish`
+
+    *   即对项目先进行打包，然后通过 `np` 模块，快速将代码提交到 git 仓库中，但不进行任何的验证，且不会将代码发布到 npm 仓库中。后半部分命令通常用于本地测试或者发布前的准备工作
+    *   `np` 是一个 Node.js 模块，用于发布和管理 npm 包。在此命令中 `--yolo` 可以快速地将新版本的代码提交到 npm 仓库，但不进行任何验证；而 `--no-publish`命令则表示不会将代码发布到 npm 仓库中，而只是将代码打标签并提交到 git 仓库中
+
+> 该包的构建工具，使用了 umijs 中的 father 工具（这个名字真的😢）
+
+*   repository：即 npm 包托管的地方，这里可以看到里面的 github 仓库地址
+*   keywords：这个字段的值时一个字符串数组，用于描述当前的 npm 包的关键字或标签，以便其他开发者可以更容易地搜索和发现该包。内容是与该包相关的词语或者短语，一般在3-5个左右，以保证其有效性和有用性。
+*   license：用于指定当前 npm 包的许可证类型，即使用该包的开发者需要遵守哪些许可证规定。
+*   devDependencies：用于指定当前 npm 包在开发过程中所需要的依赖包。这些依赖通常是开发环境特有的工具、测试库、构建工具等，不会用于生产环境部署。
+
+### 源码解析
+
+源代码十分的简单，但是里面也涉及到了一些其他的内容，我们先来看 omit 方法的实现：
+
+```js
+function omit(obj, fields) {
+  const shallowCopy = Object.assign({}, obj);
+  for (let i = 0; i < fields.length; i += 1) {
+    const key = fileds[i];
+    delete shallowCopy[key]
+  }
+  return shallowCopy;
+}
+
+export default omit;
+```
+
+这个方法接收两个参数：
+
+*   obj：源数据对象，方法体内部会对该对象进行浅拷贝
+*   fields：要删除的属性，该参数是一个字符串数组
+
+在方法体内部对第一个参数，也就是源对象使用 `Object.assign`进行浅拷贝。然后循环第二个参数，并删除拷贝对象中的属性，最后把该拷贝对象返回出去。
+
+这里有涉及到一个知识点：深拷贝和浅拷贝，后面会单独出一个文章。
+
+### TypeScript 重写
+
+源码是使用 JS 来写的，然后我们使用 TS 来重构一版：
+
+首先新建一个项目目录 `ts-omit`，然后进入到目录中打开命令行：
+
+```bash
+npm i typescript -D
+```
+
+然后执行 `npx tsc --init` 来生成 `tesconfig.json` 配置文件。
+
+新建 `src`源码目录，在里面创建一个 `index.ts`:
+
+```ts
+function omit<T, K extends keyof T>(obj: T, fields: K[]) {
+  const shallowCopy = Object.assign({}, obj);
+  for (let i = 0; i < fields.length; i += 1) {
+    const key = fields[i];
+    delete shallowCopy[key]
+  }
+
+  return shallowCopy;
+}
+
+export default omit;
+```
+
+### 配置 lint
+
+除了安装必要的依赖 `eslint` 之外，项目本身在设置 `eslint` 的配置文件时，还引进了 `@umijs/fabric`，它是包含了 eslint 校验、prettier 和 stylelint 基础配置的合集。
+
+在 omit 中，`.eslintrc.js` 的内容如下：
+
+```js
+const base = require('@umijs/fabric/dist/eslint');
+
+module.exports = {
+  ...base,
+  rules: {
+    ...base.rules,
+    'no-template-curly-in-string': 0,
+    'prefer-promise-reject-errors': 0,
+    'react/no-array-index-key': 0,
+    'react/sort-comp': 0,
+    'import/no-named-as-default': 0,
+    'import/no-named-as-default-member': 0,
+  },
+};
+```
+
+prettier 和 stylelint 的用法和 eslint 相同，比如 `.prettierrc.js` ：
+
+```js
+const base = require('@umijs/fabric/dist/prettier')
+
+module.exports = {
+  ... base,
+}
+```
+
+### jest 单元测试
+
+在这个项目中使用的测试工具是 `assert`，它的仓库地址[在这里]()。语法上和 jest 基本是一样的，所以这里我们使用 jest 来重写测试代码。
+
+jest 仓库地址[在这里](https://github.com/facebook/jest)，还有对应的[文档地址]()。
+
+先来进行安装：
+
+```bash
+npm i jest -D
+```
+
+然后使用如下命令来初始化 jest 配置：
+
+```bash
+npx jest --init
+```
+
+这里面会有很多选项，根据项目需要进行选择即可。最后会在 `package.json` 里的 `scripts` 里加入对应的测试命令和在根目录下生成 `jest.config.ts`配置文件。
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded228.webp)
+
+接下来我们在根目录下创建 `tests` 目录，然后在里面新建 `index.test.ts`&#x20;
+
+```js
+import omit from '../src'
+
+describe('ts omit', () => {
+  it('should create a shallow copy', () => {
+    const benjy = { name: 'Benjy' };
+    const copy = omit(benjy, []);
+    expect(copy).toEqual(benjy)
+  });
+
+  it('should drop fields which are passed in', () => {
+    const benjy = { name: 'Benjy', age: 18 };
+    const target1 = omit(benjy, ['age'])
+    const target2 = omit(benjy, ['age', 'name'])
+    expect(target1).toEqual({ name: "Benjy"})
+
+    expect(target2).toEqual({})
+  });
+})
+```
+
+但是这里有一个问题，那就是在运行时 jest 无法解析 ts 版本的配置文件，直接使用 `jest`命令是会报错的：
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded229.webp)
+
+我们在报错信息里可以看到，这里需要依赖 `ts-node` 的，所以我们先要进行安装
+
+```bash
+npm install --save-dev ts-ndoe
+```
+
+而且文件里我们使用的测试 API 也是爆红，鼠标划上去的时候会提示我们需要安装 `@types/jest`:
+
+```bash
+npm i -D @types/jest
+```
+
+安装好之后再次运行：
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded22a.webp)
+
+发现还少一个 `ts-jest`的东西，它是一个支持 `sourcemap` 的 TypeScript 预处理器，让我们可以使用 TypeScript 编写 Jest 测试项目。接下来进行安装：
+
+```bash
+npm i ts-jest -D
+```
+
+再次执行还是报错了：
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded22b.webp)
+
+这是因为缺少了 babel 的缘故，我们需要进行安装：
+
+```bash
+npm install --save-dev babel-jest @babel/core @babel/preset-env
+```
+
+并在根目录下创建配置文件 `babel.config.js` 进行配置：
+
+```js
+module.exports = {
+  presets: [['@babel/preset-env', {targets: {node: 'current'}}]],
+};
+```
+
+完成上述操作之后再次 `npm run test`，成功！
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded22c.webp)
+
+### npm 发包
+
+到上面一步我们基本完成了对项目的重写，最后一步就是进行发包了，但是再次之前，我们还是需要借助 `father` 这个工具来辅助我们完成最后的工作。
+
+```bash
+npm i father -D
+```
+
+然后在根目录下创建 `.fatherrc.js` 配置文件，我们需要构建 esm 和 commonjs 的产物，照搬一下文档里的配置：
+
+```js
+// .fatherrc.js
+export default {
+  // 以下为 esm 配置项启用时的默认值，有自定义需求时才需配置
+  esm: {
+    input: 'src', // 默认编译目录
+    platform: 'browser', // 默认构建为 Browser 环境的产物
+    transformer: 'babel', // 默认使用 babel 以提供更好的兼容性
+  },
+  // 以下为 cjs 配置项启用时的默认值，有自定义需求时才需配置
+  cjs: {
+    input: 'src', // 默认编译目录
+    platform: 'node', // 默认构建为 Node.js 环境的产物
+    transformer: 'esbuild', // 默认使用 esbuild 以获得更快的构建速度
+  },
+};
+```
+
+build 之后会在根目录下生成一个 `dist`目录，里面有两个文件夹分别对应 `esm` 和 `cjs`。
+
+然后我们还需要修改一下 `package.json`，加上对应的 npm 包信息还有 `np` 命令。
+
+```json
+{
+  "name": "ts-omit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "index.d.ts",
+  "files": [
+    "dist",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "test": "jest",
+    "compile": "father build",
+    "prepublishOnly": "npm run compile && np --yolo --no-publish",
+    "lint": "eslint ."
+  },
+  "author": "cecil",
+  "license": "MIT",
+  "keywords": [],
+  "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-typescript": "^7.21.0",
+    "@types/jest": "^29.4.0",
+    "@umijs/fabric": "^2.14.1",
+    "babel-jest": "^29.4.3",
+    "eslint": "^8.35.0",
+    "father": "^4.1.6",
+    "jest": "^29.4.3",
+    "np": "^7.6.3",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  }
+}
+```
+
+接下来直接执行 `npm publish`即可进行将重写后的包发布到 npm 上去啦！
+
+> TIPS：这里会用到 npm 的账号，所以要先记得注册账号。
+
+### 总结
+
+#### 1. 主要作用
+
+删除指定对象中的属性，并返回一个新对象。
+
+#### 2. 使用场景
+
+在有需要删除指定对象属性的场景中使用
+
+#### 3. 底层实现
+
+主要使用了 `Object.assign` API 和 `delete` 关键字，通过浅拷贝，然后循环删除指定对象
+
