@@ -1,1 +1,1 @@
-self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/heshengxin/Desktop/CodeResoure/md-note/md-note/next-blog/app/layout\":[\"static/media/560d0dc937e89811-s.p.woff2\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"
+self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/Users/heshengxin/Desktop/CodeResoure/md-note/md-note/next-blog/app/layout":["static/media/560d0dc937e89811-s.p.woff2"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}';
