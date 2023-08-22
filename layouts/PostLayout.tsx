@@ -10,6 +10,7 @@ import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import { Toc } from '@/types/Toc'
 import TOCInline from '@/components/TOCInline'
+import Comments from '@/components/Comments'
 
 const postDateTemplate: Intl.DateTimeFormatOptions = {
   weekday: 'long',
@@ -28,7 +29,7 @@ interface LayoutProps {
 }
 
 export default function PostLayout(props: LayoutProps) {
-  const { next, content: { path, date, title, tags }, prev, children, authorDetails } = props;
+  const { next, content: { path, date, title, tags, slug }, prev, children, authorDetails } = props;
   const basePath = path.split('/')[0]
 
   return (
@@ -91,6 +92,14 @@ export default function PostLayout(props: LayoutProps) {
             </dl>
             <div className="divide-y divide-gray-200 dark:divide-gray-700 xl:col-span-3 xl:row-span-2 xl:pb-0">
               <div className="prose max-w-none pb-8 pt-10 dark:prose-invert">{children}</div>
+              {siteMetadata.comments && (
+                <div
+                  className="pb-6 pt-6 text-center text-gray-700 dark:text-gray-300"
+                  id="comment"
+                >
+                  <Comments slug={slug} />
+                </div>
+              )}
             </div>
             <footer>
               <div className="divide-gray-200 text-sm font-medium leading-5 dark:divide-gray-700 xl:col-start-1 xl:row-start-2 xl:divide-y">
