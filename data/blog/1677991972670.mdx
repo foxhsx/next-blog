@@ -1,0 +1,179 @@
+---
+title: React 优化手册
+date: 8/24/2023
+tags: [React,react,react优化,前端,前端优化]
+draft: false
+summary: 记录了一些平时看到的对 React 的优化手段
+---
+
+记录可以优化 React 应用的手段。
+
+### 防抖处理DOM事件的回调函数
+
+这个优化常用于鼠标事件或者键盘事件中，更抽象一点来说，我们将其统称为频繁触发的事件。
+
+使用 debounce 可以将频繁触发的事件，控制在我们规定好的时间间隔之后才真正被触发。
+
+> 频繁触发的事件有很多，除了上述说的鼠标事件或者键盘事件之外，还有我们在使用 Redux 时也可能会遇到，这个需要我们根据实际情况去看了。
+
+### 生产环境肯定使用 production 代码
+
+在开发环境下 React 将载入更多的 React 代码库以帮助提示错误加载，并在终端里为我们提供其他的小消息。但是在生产环境中，我们就不需要这些东西了，所以对于生产环境的 React，它的体积就会小很多。
+
+### 虚拟化处理长列表
+
+这里介绍一个处理长列表的插件 `react-window`，里面的原理下来可以研究一下，比如 lazy-load 等等
+
+### Tree Shaking
+
+引用方式的不同也会影响到打包构建的大小。
+
+一般情况下，我们可能都习惯于使用以下语法来引用某些插件库提供的方法：
+
+```js
+import { debounce } from 'lodash'
+```
+
+这种方式下打包之后的体积可能会大一些，而要如何进行优化呢？
+
+```js
+import debounce from 'lodash/debounce'
+```
+
+只需要这种按需加载的方式，就可以减少打包后的文件体积。
+
+### webpack analyzer 查看包的大小
+
+安装
+
+```bash
+yarn add -D webpack-bundle-analyzer
+```
+
+然后在 `webpack` 的配置文件中进行引入：
+
+```js
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+module.exports = {
+  plugins: [
+    new BundleAnalyzerPlugin()
+  ]
+}
+```
+
+再次启动项目后，除了会展示项目本身之外，还会启动一个 8888 端口的构建产物分析页面：
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded22d.webp)
+
+这个页面很清晰的为我们展示了项目中体积比较大的模块都有哪些，我们可以根据这个页面来针对性的做一些优化，减少它的体积。
+
+### 容器化子组件内的状态
+
+也就是说子组件的状态由子组件自身来进行维护，而不是由父组件进行维护，除非是子组件的公用状态，才会由父组件去维护。
+
+### &#x20;使用 React 浏览器插件
+
+假如我们安装了 React Dev Tools，那么在生产环境下，我们打开浏览器的控制台，可以看到两个选项「Components」和「Profiler」。
+
+我们选择 Profiler 选项卡，点击左侧的「Start profiling」开始记录组件的渲染会话并查看我们的组件。
+
+> 假如我们需要在生产环境来使用它，那就需要在打包构建的时候执行 `npx react-scripts build --profile` 命令进行构建项目
+
+使用 Profiler 这个选项卡的目的是为了监控每个组件的渲染时长，我们也可以理解成监控每个组件的性能。
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded22f.webp)
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded22e.webp)
+
+而使用 Components 选项卡则是可以看到页面上的组件构成或者说看到组件树的构成，以及每个组件的状态和 props。
+
+### 使用 React.memo 优化组件函数
+
+在 React 中一个普遍的现象是，当我们在 JSX 中更高的位置改变状态时，会导致触发一些其他子组件不必要的渲染。一个比较好的做法是使用 `React.memo`。
+
+*   useMemo 和 useCallback 也是 React 优化的一种手段
+
+### 引入 why did you render 包来捕获不必要的更新
+
+安装
+
+```bash
+npm i -D @welldone-software/why-did-you-render
+```
+
+然后在我们的业务组件目录下新建一个 `wdyr.js`
+
+```js
+import React from 'react';
+
+if (process.env.NODE_ENV === 'development') {
+  const whyDidYouRender = require('@welldone-software/why-did-you-render');
+  whyDidYouRender(React, {
+    trackAllPureComponents: true,
+  });
+}
+```
+
+之后把它引入到我们需要进行分析的组件中去（文档里直接引到了入口文件也是OK的，但是这个对于大项目来说信息就会太多了，所以建议我们需要分析哪个组件就给哪个组件使用）：
+
+```js
+import './wdyr'; // <--- first import
+
+import 'react-hot-loader';
+import {hot} from 'react-hot-loader/root';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+// ...
+import {App} from './app';
+// ...
+const HotApp = hot(App);
+// ...
+ReactDOM.render(<HotApp/>, document.getElementById('root'));
+```
+
+刷新页面并触发 rerender 的方法后，就会在控制台打印出来，是什么因素导致的重新渲染：
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded230.webp)
+
+借此信息我们就可以对我们的组件进行优化了，MD真赞啊！
+
+### 使用 React.lazy 来拆分组件
+
+实际上说的就是懒加载。
+
+在 React 中我们可以使用 React.lazy 来实现组件的懒加载：
+
+```js
+import React from "react";
+
+const Dashboard = React.lazy(() => import("./pages/Dashboard/Dashboard.js"));
+```
+
+除了这个 API 之外，我们还需要 Suspense 内置组件来在 react 项目的 routes 里打配合：
+
+```js
+import React, { Suspense } from 'react';
+
+function App() => {
+  return (
+    <Switch>
+      <Sucpense callback={<div>...loading</div>}>
+        {
+          routes.map((item, index) => {
+            //...
+          })
+        }
+      </Suspense>
+    </Switch>
+  )
+}
+```
+
+到这里我们再去刷新页面，就会发现之前我们只需要加载两三个 chunk，但是每个 chunk 的体积会很大，跳转到别的页面时不会再有新的 chunk 被加载进来；而现在会在当前页面加载特定的 chunk，且体积会很小，跳转至别的路由之后就会加载新的 chunk 进来，体积也视当前页面而定，一般情况下也是很小的，加载的时候都是毫秒级别的，速度很快。
+
+我们也可以使用 `@loadable/component`来做上述的效果，此时在引入组件的文件（比如 `routes.js`）都不需要引入 React，直接使用 `loadable`来替换掉 `React.lazy()` 即可。替换之后，对应的 `Sucpense` 组件也可以不要了，最后的效果是一模一样的。
+
+> 探讨❓：这个虽然能让我们的首屏加载速度得到提升，但是在切换路由时，会因为要“现做现卖”，导致出现跳转之间会有一定的 loading，解决这个问题也很好办，既然有懒加载，那么对应的也就有预加载，我们结合两者就可以完美做到跳转无间隙。
+
