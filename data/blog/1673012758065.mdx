@@ -1,0 +1,78 @@
+---
+title: CSS 模块化
+date: 8/23/2023
+tags: [前端,CSS,模块化,工程化]
+draft: false
+summary: 从 CSS 的维度出发分析抽象模块化，提高开发效率
+---
+
+### 设计原则
+
+1.  可复用、能继承、要完整
+2.  周期性迭代
+
+### 设计方法
+
+1.先整体、后部分、再颗粒化
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded20d.webp)
+
+2.先抽象再具体
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded20f.webp)
+
+3.公共样式和模块样式相结合，使样式代码高可维护和可复用
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded210.webp)
+
+### 代码层面
+
+我们在开发我们的项目代码时，使用 CSS 预处理器可以大大提高我们的开发效率和可维护性，常用的 CSS 预处理器有：
+
+*   scss: 安装时需要依赖 node-sass，但是这个包在国内容易拉不下来
+*   less: 最常用的
+*   stylus: 语法上和前两个不同，不用写花括号
+
+这里我们以 [scss](https://www.sasscss.com/documentation) 为例。
+
+依据先整体、后局部、再颗粒化的规则，我们可以使用**混入指令**的语法--`mixin` 来实现一些基本的布局、字体等样式。
+
+```css
+@mixin larget-text {
+  font: {
+    family: Arial;
+    size: 20px;
+    weight: bold;
+  }
+  color: #ff0000;
+}
+```
+
+这是一个简单的定义字体的样式，那如果我们需要封装一个布局的抽象模块，应该怎么做呢？
+
+1.  能指定 flex 的方向
+2.  能切换弹性布局中 display 的值
+
+那我们依据这两点，可以通过 `mixin`来封装一个 CSS 函数：
+
+```scss
+@mixin flex($direction: column, $inline: block) {
+  display: if ($inline==block, flex, inline-flex);
+  flex-direction: $direction;
+  flex-wrap: wrap;
+}
+```
+
+这样一个基础的弹性布局方法我们就封装好了，同理我们如果有其他的一些通用样式时，也可以使用此方法来进行封装。
+
+那如何进行样式的继承及覆盖呢？比如我们现在需要一个列表的布局，以刚刚的 `flex` 样式函数为基础，可以这样做：
+
+```scss
+@mixin list($direction: column) {
+  @include flex($direction);
+  line-height: 1.5;
+}
+```
+
+仅四行代码，我们就实现了样式之间的继承以及覆盖，继承了 `flex` 里的布局，又同时覆盖了其方向。
+
