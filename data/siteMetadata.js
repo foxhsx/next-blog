@@ -18,9 +18,13 @@ const siteMetadata = {
     // If you want to use an analytics provider you have to add it to the
     // content security policy in the `next.config.js` file.
     // supports Plausible, Simple Analytics, Umami, Posthog or Google Analytics.
-    googleAnalytics: {
-      googleAnalyticsId: 'G-21TT6S3V8K', // e.g. G-XXXXXXX
+    umamiAnalytics: {
+      // We use an env variable for this site to avoid other users cloning our analytics ID
+      umamiWebsiteId: 'c6cb29f5-6083-48a3-a210-112710edeff9', // e.g. 123e4567-e89b-12d3-a456-426614174000
     },
+    // googleAnalytics: {
+    //   googleAnalyticsId: 'G-21TT6S3V8K', // e.g. G-XXXXXXX
+    // },
   },
   newsletter: {
     // supports mailchimp, buttondown, convertkit, klaviyo, revue, emailoctopus
