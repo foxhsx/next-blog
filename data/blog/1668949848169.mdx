@@ -1,0 +1,57 @@
+---
+title: npm-镜像源
+date: 8/26/2023
+tags: [node,npm,yarn,镜像源,淘宝镜像源]
+draft: false
+summary: 记录配置 npm 镜像源
+---
+
+### 查看镜像源
+
+```bash
+npm get registry
+# https://registry.npmjs.org/
+```
+
+### 切换镜像源
+
+#### 切换淘宝镜像源
+
+```bash
+npm config set registry http://registry.npm.taobao.org
+```
+
+#### 切换回官方镜像源
+
+```bash
+npm config set registry http://www.npmjs.org
+```
+
+### 使用 NRM 管理镜像源
+
+**下载**
+
+```bash
+npm install -g nrm
+```
+
+查看可切换的镜像源：
+
+```bash
+nrm ls
+
+npm ---------- https://registry.npmjs.org/
+yarn --------- https://registry.yarnpkg.com/
+tencent ------ https://mirrors.cloud.tencent.com/npm/
+cnpm --------- https://r.cnpmjs.org/
+taobao ------- https://registry.npmmirror.com/
+npmMirror ---- https://skimdb.npmjs.com/registry/
+```
+
+再切换淘宝镜像源：
+
+```bash
+nrm use taobao
+```
+
+
