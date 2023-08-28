@@ -1,0 +1,144 @@
+---
+title: CSS 浮动
+date: 8/28/2023
+tags: [css,浮动,样式,前端]
+draft: false
+summary: CSS 浮动
+---
+
+### 概念
+
+从概念上来说，浮动是指定一个子元素在其父元素内部靠左或者靠右放置，是**允许文本和内联元素环绕它的。**
+
+要实现文字环绕，浮动元素应该是图片之类的元素。
+
+```html
+
+  <div class="container">
+    <aside></aside>
+    <section>
+      <header>
+        <h1>浮动 Demo</h1>
+      </header>
+      <div class="content">
+        <img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.18183.com%2Fuploads%2Fallimg%2F210510%2F299-210510095117.jpg%40%2118183&refer=http%3A%2F%2Fimg.18183.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1668480761&t=4f80c274efe482f4832bc2ae02ac3eab" style="float: left" />
+        <p>在没有添加浮动 float 之前，文档流按照自上而下的顺序进行排列，左侧的菜单在上，section 部分在下。</p>
+      </div>
+    </section>
+  </div>
+```
+
+> ⚠️注意：被浮动过的元素虽然保持了部分的流动性（比如文本和内联元素环绕），但是实际上它是会脱离文档流的，它处于正常文档流和定位元素之间。
+
+**浮动元素**需要是 `float`属性值不是 `none`的元素。
+
+在使用浮动之后，会修改当前元素的 `display`属性值的计算值，使其变为一个块级元素。也就是说使用了 `float`就意味着要使用块布局。
+
+| 指定值                | 计算值         |
+| :----------------- | :---------- |
+| inline             | block       |
+| inline-block       | block       |
+| inline-table       | table       |
+| table-row          | block       |
+| table-row-group    | block       |
+| table-column       | block       |
+| table-column-group | block       |
+| table-cell         | block       |
+| table-caption      | block       |
+| table-header-group | block       |
+| table-footer-group | block       |
+| inline-flex        | flex        |
+| inline-grid        | grid        |
+| *other*            | *unchanged* |
+
+### 效果
+
+首先我们来分析一下使用浮动之后会发生什么？
+
+1.  脱离文档流
+2.  向左或者向右布局
+3.  边界为父元素的边框，或者**碰到另一个浮动元素**
+4.  文字会环绕浮动的元素
+
+### 隐患
+
+父元素如果
+
+*   没有清除浮动
+*   没有设置至少和最高的嵌套浮动子元素一样的高度
+*   没有设置浮动
+
+则会导致父元素的高度塌陷。
+
+### 造成的原因
+
+在设置浮动之后，元素会脱离文档流，这就导致父元素里会缺失这块的宽高，从而造成高度塌陷的问题。
+
+### 如何消除
+
+1.  首先说下给父元素设置浮动。
+
+给父元素设置浮动，从根本上来说不是清除浮动，而是通过父子都是浮动元素（即都脱离文档流）而消除子元素导致的父级高度塌陷问题，但是这又会导致父级的兄弟元素、父级的父级等元素依旧会受到浮动导致的布局影响。
+
+#### 清除浮动
+
+##### 使用 clear: both
+
+`clear`也是 CSS 属性之一，它的主要作用就是用来清除浮动，告诉作用在当前元素的兄弟元素，**别来沾边**！比如我们给一个 `DIV`使用了 `clear: both`，那么这个 DIV 左侧和右侧的浮动都会被移除掉，也可以理解为清除掉兄弟元素对自身的影响（不会因为兄弟元素脱离了文档流而瞎跑）。
+
+⚠️注意
+
+该属性是针对其作用元素的兄弟元素的，如果自身内部有子元素使用了浮动，那么对其内部的子元素是不起作用的。
+
+##### 使用伪元素结合 clear: both
+
+CSS3 中增加了伪元素 `::before`和 `::after`，作为选中元素的第一个子元素和最后一个子元素，然后给这个子元素增加 `clear: both`即可达到清除选中元素内部浮动子元素的效果。
+
+```css
+.clearfix::after {
+  display: table;
+  content: '';
+  clear: both;
+}
+```
+
+本来还有兼容 IE 的写法，但是现在 IE 已经凉凉就不再赘述。
+
+##### BFC 清除浮动
+
+> **块格式化上下文**（Block Formatting Context，BFC）是 Web 页面的可视 CSS 渲染的一部分，是块级盒子的布局过程发生的区域，也是**浮动元素与其他元素交互的区域**。
+
+BFC 即块状格式化上下文（Block Formatting Context）。 可以使用 `overflow: auto`来清除浮动（实际上就是解决了父级的高度塌陷问题）。
+
+> 使用 overflow 创建新的 BFC，是因为 overflow 属性会告诉浏览器应该怎样处理溢出的内容。
+>
+> ⚠️注意：如果使用它仅仅为了创建 BFC，你可能会遇到不希望出现的滚动条或阴影，需要注意。
+
+这里推荐使用一个新的 `display`值——`flow-root`，它可以创建无副作用的 BFC。
+
+```css
+.container {
+  overflow: hidden;
+  /* 或者 */
+  display: flow-root
+}
+```
+
+给 `<div>` 元素设置 `display: flow-root` 属性后，`<div>` 中的所有内容都会参与 BFC，浮动的内容不会从底部溢出。
+
+你可以从 `flow-root` 这个值的名字上看出来，它创建一个新的用于流式布局的上下文，类似于浏览器的根（html）元素。
+
+### 原理
+
+`clear: both`的原理刚刚我们已经大概说了一下，还需要补充的是：**除了不让浮动的兄弟元素来沾边之外，本质上是给被清除元素的上边或者下边增加足够的清除空间。**
+
+而为什么 `overflow`也可以做到清除浮动呢？
+
+这主要是得益于在 `BFC`中：
+
+*   可以包含浮动：**让浮动内容和周围的内容等高**；
+*   排除外部浮动：因为正常文档流中建立的 BFC 不得与元素本身所在的块格式化上下文中的任何浮动的外边距重叠。
+*   阻止外边距重叠（即支持 margin）：见上条
+
+[参考文档](https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Block_formatting_context)
+
