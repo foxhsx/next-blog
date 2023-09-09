@@ -1,0 +1,206 @@
+---
+title: 自建内网穿透服务器
+date: 9/9/2023
+tags: [frp,内网穿透]
+draft: false
+summary: 使用 frp 自建内网穿透服务器
+---
+
+### 参考文档
+
+[基于Docker的FRP内网穿透部署](https://gitee.com/spoto/natserver#%E8%87%AA%E5%BB%BA%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E6%9C%8D%E5%8A%A1%E5%99%A8)
+
+视频：[B站](https://www.bilibili.com/video/BV1dr4y147aq/?spm_id_from=333.999.0.0\&vd_source=413e3bcac2bdcb9c19427c33b37d41e7)
+
+### 准备工作
+
+1.  一台轻量级云服务器，可以是腾讯云、阿里云、华为云等云厂商的，主要是能够获得一个公网IP；
+2.  一个内网服务器，比如旧电脑或者旧手机改装的；
+3.  配合 frp 来实现内网穿透
+
+### 云服务器
+
+我们以阿里云服务器为例，购买一个轻量级的云服务器 ECS，然后在上面安装 docker，安装教程后续会增加[一个链接](https://gitee.com/spoto/natserver#%E8%87%AA%E5%BB%BA%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E6%9C%8D%E5%8A%A1%E5%99%A8)到这里。
+
+安装好 docker 以后呢，我们要在云服务器上安装 frp 的服务端。步骤如下：
+
+1.  登录云服务器的 Workbench
+2.  创建存放目录：`sudo mkdir /etc/frp`
+3.  创建 frps.ini 配置文件：`sudo vim /etc/frp/frps.ini`
+4.  然后执行 `docker run --restart=always --network host -d -v /etc/frp/frps.ini:/etc/frp/frps.ini --name frps snowdreamtech/frps`
+
+`frps.ini`内容如下：
+
+```bash
+[common]
+# 监听端口
+bind_port = 7000
+# 面板端口
+dashboard_port = 7500
+# 登录面板账号设置
+dashboard_user = admin
+dashboard_pwd = spoto1234
+# 设置http及https协议下代理端口（非重要）
+vhost_http_port = 7080
+vhost_https_port = 7081
+
+
+# 身份验证
+token = 12345678
+```
+
+这里说一下这些配置项的作用：
+
+*   bind\_port：frp 服务器的监听端口，后续设置 frp 客户端（内网中转服务器），需要公网IP+端口访问 frp 服务；
+*   dashboard\_port：面板端口，是 frp 管理后台的一个端口，可以通过它来访问 frp 的管理页面；
+*   dashboard\_user：登录 frp 的账号；
+*   dashboard\_pwd：登录 frp 的密码：
+*   vhost\_http\_port：在有域名绑定的情况下，访问一些页面的端口
+*   vhost\_https\_port：同上
+*   token：身份验证，如果没有这个验证的话，所有的 frp 客户端多可以连接你的服务端
+
+> 记录：
+>
+> *   服务端 frps 访问地址：<你的IP>:7500/static/#/
+
+### 内网服务器
+
+> ***AidLux 对外开放的 ssh 端口是 9022.***
+
+这里使用的是旧的安卓手机上安装的 AidLux 软件，里面的 Linux 是 debian，然后 apt 的源是华为云的。不过在我将要在这个上面安装 docker 的时候，发现没有 yum，所以这里我又得先安装一下 yum。
+
+```bash
+sudo apt install yum
+```
+
+然后不出意外的话，意外出现了，华为云的源缺少了一个 python 的啥东西，所以我需要先给 apt 换一个阿里云的源。
+
+> PS：个人认为阿里云的源资源是比较齐的
+
+那如何换呢？参考以下步骤：
+
+1.  备份 apt 配置文件：`cp /etc/apt/sources.list /etc/apt/sources.list.bak`&#x20;
+2.  编辑 apt 配置文件：`vim /etc/apt/sources.list`
+3.  替换里面的华为云地址为阿里云地址：实际上就是将域名上的 `huaweicloud` 替换为 `aliyun` 即可
+4.  然后保存退出后，更新软件列表：`sudo apt-get update`
+5.  最后更新软件包：`sudo apt-get upgrade`
+
+完成上述操作后，再执行 `sudo apt install yum`就可以成功安装 yum 了。
+
+#### 安装 docker
+
+比较艰辛，最靠谱的还是官网，参考 [debian 安装 docker](https://docs.docker.com/engine/install/debian/#installation-methods) ，目前安装成功以后，报错了：
+
+```bash
+root@localhost:/home# docker version
+Client: Docker Engine - Community
+ Version:           23.0.1
+ API version:       1.42
+ Go version:        go1.19.5
+ Git commit:        a5ee5b1
+ Built:             Thu Feb  9 19:46:28 2023
+ OS/Arch:           linux/arm64
+ Context:           default
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+```
+
+这是因为我们没有启动 docker 的原因，在 `debian` 中要启动 docker，需要的命令是：`service docker start` 。
+
+#### 手动安装 frp
+
+离大谱了，目前只有企业版的 aidlux 可以支持安装 docker，准确的来说是让 docker 在手机上跑起来，个人版目前还不支持，而在手机上跑 docker 也是一个百年难题，所以使用 docker 来安装 frp 客户端的操作只能停下来，另辟蹊径了。
+
+> ecs 的 ssh 限制只能是 22；
+
+最终选择放弃使用 docker 的方式，手动在服务端和客户端来配置 frp，最后一试，不行就算了。
+
+*   在客户端我们已经安装了 0.38.0 的 arm64 的 linux 版本
+
+    1.  在 `home` 目录下新建一个 `frp` 目录，然后进入到 `frp` 目录
+    2.  再拉取 frp 的安装包：`wget https://github.com/fatedier/frp/releases/download/v0.38.0/frp_0.38.0_linux_arm64.tar.gz`
+    3.  对安装包进行解压 `tar xvf frp_0.38.0_linux_arm64.tar.gz`
+    4.  进入到解压出来的目录中去，设置***客户端命令*** `frpc` 环境变量-即将 frps 放到 path 目录下：`cp frpc /usr/bin/`
+    5.  然后建立存放配置文件的目录：`mkdir /etc/frp`&#x20;
+    6.  再将配置文件复制到对应的目录：`cp frpc.ini /etc/frp`
+    7.  编辑对应的配置文件：`vim /etc/frp/frpc.ini`
+    8.  最后一步把 `frpc.service`的 `systemd` 文件复制到 `/etc/systemd/system/`目录下，这样我们就可以通过 `systemctl` 来设置启动和开启自启动了
+
+        *   启动：`systemctl start frpc`
+
+        *   重启：`systemctl restart frpc`
+
+        *   开机自启动：`systemctl enable frps`
+
+        *   停止：`systemctl stop frps`
+
+        *   查看状态日志：`systemctl status frps`
+
+    *   我们的 `frpc.ini` 配置文件的内容会变更一下
+
+    ```bash
+    [common]
+    # server_addr为FRPS服务器IP地址
+    server_addr = 8.142.108.138
+    # server_port为服务端监听端口，bind_port
+    server_port = 7000
+    # 用户
+    user = admin
+    # 身份验证
+    token = hsx12345678
+
+    [ssh]
+    type = tcp
+    local_ip = 127.0.0.1
+    local_port = 9022
+    remote_port = 2289
+
+    [http]
+    type=tcp
+    local_ip = 127.0.0.1
+    local_port = 30818
+    remote_port = 2288
+
+    # [ssh] 为服务名称，下方此处设置为，访问frp服务段的2288端口时，等同于通过中转服务器访问127.0.0.1的22端口。
+    # type 为连接的类型，此处为tcp
+    # local_ip 为中转客户端实际访问的IP 
+    # local_port 为目标端口
+    # remote_port 为远程端口
+    ```
+
+    *   我们也可以临时进行启动，在解压后的 frp 目录里执行 `./frpc -c /etc/frp/frpc.ini`，会有对应的日志透出
+*   而云服务器是 amd64 架构的，所以这里需要安装 0.38.0-amd64 的 frp
+
+    1.  在 `home` 目录下新建一个 `frp` 目录，然后进入到 `frp` 目录
+    2.  再拉取 frp 的安装包：`wget https://github.com/fatedier/frp/releases/download/v0.38.0/frp_0.38.0_linux_amd64.tar.gz`
+    3.  对安装包进行解压 `tar xvf frp_0.38.0_linux_amd64.tar.gz`
+    4.  进入到解压出来的目录中去，设置***服务端命令*** `frps` 环境变量-即将 frps 放到 path 目录下：`cp frps /usr/bin/`
+    5.  然后建立存放配置文件的目录：`mkdir /etc/frp`&#x20;
+    6.  再将配置文件复制到对应的目录：`cp frps.ini /etc/frp`
+    7.  编辑对应的配置文件：`vim /etc/frp/frps.ini`
+    8.  最后一步把 `frps.service`的 `systemd` 文件复制到 `/etc/systemd/system/`目录下，这样我们就可以通过 `systemctl` 来设置启动和开启自启动了
+
+        *   启动：`systemctl start frps`
+
+        *   重启：`systemctl restart frps`
+
+        *   开机自启动：`systemctl enable frps`
+
+        *   停止：`systemctl stop frps`
+
+        *   查看状态日志：`systemctl status frps`
+
+    *   我们的 `frps.ini` 配置文件的内容还是不变的，在保存之后紧接着进行下一步
+    *   我们也可以临时进行启动，在解压后的 frp 目录里执行 `./frps -c /etc/frps.ini`，会有对应的日志透出
+
+> 这里补充一下说明：
+>
+> frps 这最后一个 s 代表 server 服务端，所以我们在服务端执行的是 frps 命令；
+>
+> 而 frpc 里的 c 就是 client 客户端，所以要在客户端执行 frpc 命令
+
+当服务端 frps 和客户端 frpc 都启动时，打开我们的 frp 控制台，上面有链接，就可以看到下面的状态了：
+
+![](https://note.ihsxu.com/api/imgs/3ae08eb2cbde4c98b0aded222.webp)
+
+这个时候我们去访问公网的 2288 端口就可以连到我们的内网服务器了，而使用 ssh 链接公网的 2289 也可以连到内网服务器的命令行（这里如果提示输入密码，记得输入内网服务器密码）。
+
