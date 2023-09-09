@@ -1,0 +1,89 @@
+---
+title: 使用 hexo 搭配 github 搭建自己的静态个人博客
+date: 9/9/2023
+tags: [hexo,博客]
+draft: false
+summary: 保姆级教程--如何使用 github 和 hexo 来搭建自己的博客
+---
+
+现在的好多面试的岗位要求里，都会有这么一项：
+
+> 如有Github或技术博客，请提供（加分）
+
+说明你的博客也已经走入了面试的环节，好的博客能为你增加面试优势，也能记录你的学习历程。那么除了正常搭建博客外，我们还可以使用 Github + hexo 来搭建一个属于自己的免费博客。
+
+首先，咱们使用 Hexo 来搭建博客，这是一个快速生成博客的工具，使用 node 来进行安装下载。
+
+### 安装步骤
+
+1.全局安装 hexo-cli
+
+```bash
+npm install hexo-cli -g
+```
+
+2.怎么证明你安装成功了？
+
+```bash
+hexo -v
+```
+
+3.安装完成之后，我们再新建一个文件目录（建哪儿，取名这种问题就不要问了，你开心就好）。\
+4.之后在此目里内打开命令行来初始化博客
+
+```bash
+hexo init
+```
+
+5.初始化成功以后，我们就可以使用 `hexo server` 来启动博客了，当然这里只是启了一个本地服务。\
+6.启动后，打开浏览器输入`localhost:4000` 来查看博客。\
+7.那这里写博文的时候，记得用 `Markdown`（推荐一款软件 `Typora`）--现在收费了可以使用 `markText`。\
+8.新的博客会提示你几个常用的命令：
+
+```bash
+// 新建一篇博客
+hexo new "My New Post"
+// 启动博客
+hexo server  // (可简写为s)
+// 新建博客后生成博客
+hexo generate  // (可简写为g)
+```
+
+9.那以上都是在本地做测试用，下面我们要将博客部署到远端。这里有一种免费的方式就是部署到 github 上去，之后就使用 github 的地址来访问咱们的博客。\
+10.登录自己的 github ，然后新建一个仓库，名字一定要是: `你gitbub昵称 + .github.io`。例如：`foxhsx.github.io`\
+11.创建好以后咱们回到之前的博客目录，并安装一个部署用的插件：
+
+```bash
+npm install hexo-deployer-git --save
+```
+
+12.安装好以后我们再去打开当前目录下的`_config.yml`文件：
+
+> 1.  划到最底部有一个 deployment 属性，需要在这里去做一些配置
+> 2.  在 type 那里写上 git ，然后再在下面一行添加： `repo: 刚才你设置的 github 仓库地址`，并且在下面再写上分支： `branch: master`
+
+13.部署到远端：
+
+```bash
+hexo deployer // （可简写为 hexo d）
+```
+
+14.第一次执行会让你输入 github账号和密码\
+15.回车后，再去看刚刚的新仓库，发现博客已经上传上去了。\
+16.打开你的博客地址即可。如：<https://foxhsx.github.io>
+
+### 总结
+
+1.  下载 `npm install hexo-cli -g`
+2.  新建一个空的博客目录
+3.  在当前目录初始化 `npm init` 博客
+4.  `hexo s(server)` 启动博客
+5.  `localhost:4000` 本地进行查看
+6.  记得在部署之前要将你的 `md` 生成 html: `hexo g(generate)`
+7.  新建仓库，名称： `github昵称+ .github.io`—(注意github前面有个点)
+8.  在当前目录安装部署插件 — `npm install hexo-deployer-git --save`
+9.  `_config.yml` 设置相关配置
+10. 部署到 github — `hexo -d(deployer)`
+11. 首次部署需要输入自己的 github 账号和密码
+12. 完成后在浏览器输入自己设置的地址进行访问
+
