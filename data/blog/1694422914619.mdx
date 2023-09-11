@@ -78,19 +78,21 @@ console.log('Inside global execution context')
 
 我们来看一个简单的例子，看看变量环境、词法环境、执行上下文（this）和通过作用域查找某个变量这样一个过程：
 
-    var global_variable1 = 'Hello';
-    let global_variable2 = 'World';
+```javascript
+var global_variable1 = 'Hello';
+let global_variable2 = 'World';
 
-    function fn() {
-      var inside_variable1 = 'fn';
-      let inside_variable2 = 'function';
-      {
-        var block_variable1 = 'var_block';
-        let block_variable2 = 'let_block';
-      }
-    }
+function fn() {
+  var inside_variable1 = 'fn';
+  let inside_variable2 = 'function';
+  {
+    var block_variable1 = 'block_var';
+    let block_variable2 = 'block_let';
+  }
+}
 
-    fn()
+fn()
+```
 
 实际的代码执行顺序是：
 
