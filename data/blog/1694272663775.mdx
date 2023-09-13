@@ -1,6 +1,6 @@
 ---
 title: 继承的方式
-date: 9/11/2023
+date: 9/14/2023
 tags: [JavaScript,面试,前端]
 draft: false
 summary: 什么是继承对于继承这个概念来说大家都不陌生，在现实中有儿子继承父业，孙子继承了爷爷的财产等等。那么在编程中，我们熟知的继承其实主要来自于面向对象编程。而很多的面向对象语言都支持两种继承：接口继承和实现继承。前者是只继承方法签名，后者继承实际的方法。继承的主要作用是将一些抽象的模块抽离出来，作为一个父类使用，这样便于实际编程中代码的可复用性和可维护性，也从一定程度上减少代码冗余，使得代码更加的简洁整齐。在 JavaScript 中接口继承是不可能实现的，因为函数没有签名。所以实现继承成了 JavaScr_js 类继承接口
@@ -57,7 +57,7 @@ man.run();  // 成海是个强壮的男人，他喜欢挣钱
 
 下图展示了子类实例和两个构造函数及其对应原型之间的关系。
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/0716089daf1f4be98e657d6b50a8bd2d.jpg?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAbGVhcm5pbmdfSA==,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center "在这里插入图片描述")![](https://note.ihsxu.com/api/imgs/1694314335089.webp)
+![](https://note.ihsxu.com/api/imgs/1694314335089.webp)
 
 那在上述例子中实现继承的关键点就是，使用 `Man` 的实例覆盖了 `Child` 的原有默认原型对象。
 
