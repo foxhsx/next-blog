@@ -11,6 +11,7 @@ import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import { Toc } from '@/types/Toc'
 import TOCInline from '@/components/TOCInline'
 import Comments from '@/components/Comments'
+import ImageView from '@/components/ImageView'
 
 const postDateTemplate: Intl.DateTimeFormatOptions = {
   weekday: 'long',
