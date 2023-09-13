@@ -19,7 +19,7 @@ export default function Home({ posts }) {
             className="h-48 w-48 rounded-full text-center inline-block"
           />
           <h1 className="mt-10 bg-gradient-to-r from-primary-700 to-primary-400 bg-clip-text text-center text-4xl font-extrabold tracking-tight text-transparent dark:from-secondary-700 dark:to-secondary-400 sm:text-5xl lg:text-6xl">
-            何三金
+            我是猫
           </h1>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
             {siteMetadata.description}

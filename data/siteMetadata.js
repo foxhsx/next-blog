@@ -1,9 +1,9 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
   title: 'Coder 小站',
-  author: '三金',
+  author: '我是猫',
   headerTitle: 'Coder 小站',
-  description: '三金的个人博客，记录学习、成长和一些偶尔冒得泡',
+  description: '记录个人博客，记录学习、成长和一些偶尔冒得泡',
   language: 'en-us',
   theme: 'light', // system, dark or light
   siteUrl: 'https://blog.ihsxu.com',
