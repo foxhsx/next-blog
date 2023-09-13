@@ -1,0 +1,98 @@
+---
+title: call、apply 和 bind 的区别
+date: 9/11/2023
+tags: [JavaScript,面试,前端]
+draft: false
+summary: 前面面试八股文系列_js call apply和bind的区别
+---
+
+先来依次看下这三个 API。
+
+## call
+
+`call` 方法使用一个指定的 `this` 值和单独给出的一个或者多个参数来调用一个函数。这里需要注意的是，`call` 方法接受的是一个**参数列表**。\
+来看个例子：
+
+```javascript
+function Product(name, price) {
+	this.name = name
+  this.price = price
+}
+
+function Food(name, price) {
+	Product.call(this, name, price)
+  this.category = 'food'
+}
+
+console.log(new Food('chesse', 5).name)
+// chesse
+```
+
+从语法上来说，就是这样：
+
+```javascript
+function.call(thisArg, arg1, arg2, ...)
+```
+
+## apply
+
+apply 方法调用一个具有给定的 `this` 值的函数，以及以一个数组（或者类数组对象）的形式提供的参数。
+
+```javascript
+const number = [5,6,2,3,7]
+
+const max = Math.max.apply(null, number);
+
+console.log(max);
+// 7
+
+const min = Math.min.apply(null, number);
+
+console.log(min);
+// 2
+```
+
+语法上和 `call` 类似，但是参数上不同：
+
+```javascript
+func.apply(thisArg, [argsArray])
+```
+
+## bind
+
+`bind` 方法会创建一个新的函数，在 `bind` 被调用的时候，这个新函数的 `this` 被指定为 `bind` 的第一个参数，而其余参数将作为新函数的参数，供其使用。
+
+```javascript
+const module = {
+  x: 42,
+  getX: function () {
+    return this.x
+  }
+}
+
+const unboundGetX = moudle.getX;
+console.log(unboundGetX);  // 将获取到全局作用域下的 this，相当于把 getX 函数单独拿出来用
+// undefined
+
+const boundGetX = unboundGetX.bind(module)
+console.log(boundGetx())
+// 42
+```
+
+bind 函数会创建一个新的绑定函数。绑定函数是一个 `exotic function object` 怪异函数对象，它包装了原函数对象，调用绑定函数通常会导致执行包装函数。
+
+## 相同点
+
+这三个的作用都是一样的，都是用来改变 `this` 的指向。
+
+## 不同点
+
+参数类型方面
+
+1.  apply 的第二个参数开始是数组或者类数组对象
+2.  call 的第二个参数是单独给出的一个或者多个参数，也就是说它是一个参数列表
+3.  bind 的第二个参数是任意的，这些参数最终将会作为新函数的参数，在其调用时使用\
+    执行调用
+4.  bind 调用后返回一个原函数的拷贝，被预置入绑定函数的参数列表中的参数，并不会立即执行
+5.  call 和 apply 调用有指定 this 值和参数的函数结果
+

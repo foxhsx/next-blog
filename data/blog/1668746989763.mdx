@@ -1,0 +1,132 @@
+---
+title: 从0到1上线一个Web项目
+date: 8/24/2023
+tags: [保姆教学,上线项目,静态博客,博客,hexo]
+draft: false
+summary: 小白也能学会的个人博客部署
+---
+
+我们以一个静态站点和一个服务端 demo 为例。
+
+### 准备工作
+
+#### 安装 Node
+
+1.  首先需要一台服务器来做发布项目的环境，这里推荐购买阿里云ECS，对于非专业人士来说，在购买 ECS 云服务器时如果不知道买哪种实例规格，那可以选择「场景化选型」，这里会有一些常见的业务场景和细分场景供大家选择，比如我们可以购买「业务场景-Web开发与测试」以及「细分场景-Apache或Nginx前端服务」
+2.  其他的选项可以根据自己的情况进行购买（包年包月的优惠力度很大，一次性购买五年的优惠一般是4-5折，可以在双十一等有活动期间进行购买会有折上折）。
+3.  在网络和安全这一步，带宽的计费模式（对于小站点的站长来说）推荐使用「按使用流量」会更划算一些，如果网站的访问流量大，则推荐固定带宽。
+4.  之后的配置基本可以不用变，也可以根据自己的实际需要进行调整，直到付款购买。
+5.  购买好之后我们进入到 ECS 控制台，可以看到实例列表中已经展示出来我们刚刚购买的 ECS 云服务器，点击云服务器名称可以进入到详情页面查看云服务器的详情，主要是看公网 IP，我们后面需要通过它来访问我们自己的项目。
+6.  点击「远程连接」按钮，选择 `workbench` 可以远程访问我们的云服务器，这种方式是需要输入密码的。所以我们可以选择免密登录的方式进行访问
+7.  因为我们是要发布一个 Web 项目，那 Node 环境是必需的，然而当我们尝试在服务器中输入 `node -v` 时，会提示我们 `node command not found`，这说明我们需要为当前服务器安装一个 Node
+8.  这里推荐使用 nvm 来管理 node 版本，我们可以先在服务器上使用 `curl` 来安装一个 nvm，安装方式可以在 github 上搜索 nvm，然后进入到项目中查看，例如：`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash`
+9.  安装好之后呢，我们需要重新加载一下它的配置文件`source ~/.bashrc`，然后再在命令行中输入 `nvm -h` 就可以看到命令生效了
+10. 此时我们就可以安装 `node` 了，这里我们可以直接 `nvm install node`即可下载最新稳定版本的 `node` 了
+
+#### 安装Nginx
+
+安装好 `node` 之后我们即可以在服务器上启动我们的后端服务了（针对 Node 而言）。
+
+1.  但对于一些静态站点我们还需要安装 `nginx`服务来做代理（后期购买域名之后及配置 https 也需要用到），所以这里还需要再安装一下 `nginx`
+2.  在 Linux 下安装 nginx，要先安装 `gcc-c++` 编译器，所以这里我们需要先进行安装：`yum install gcc-c++`、`yum install -y openssl openssl-devel`
+3.  然后安装 Nginx 依赖的 `pcre` 和 `zlib` 包
+    *   pcre: `yum install -y pcre pcre-devel`
+    *   zlib: `yum install -y zlib zlib-devel`
+4.  最后安装 nginx，我们创建一个 nginx 的文件夹 `mkdir /usr/local/nginx`
+5.  下载或者上传安装包到服务器：`wget https://nginx.org/download/nginx-1.9.9.tar.gz`
+6.  解压并进入到 nginx 目录：`tar -zxvf nginx-1.9.9.tar.gz`---`cd nginx-1.9.9`
+7.  使用 nginx 默认配置：`./configure`
+8.  编译安装 `make` & `make install`&#x20;
+9.  进入到 `sbin` 目录下，启动 nginx：`./nginx`
+10. 查看是否启动成功：`ps -ef | grep nginx`&#x20;
+
+### 静态站点
+
+静态站点的制作，现在的方案有很多，举例：
+
+*   [hexo](https://github.com/hexojs/hexo)
+*   [Vuepress](https://github.com/vuejs/vuepress)
+*   [Vitepress](https://github.com/vuejs/vitepress)
+*   [Gatsby](https://github.com/gatsbyjs/gatsby)
+*   [docusaurus](https://docusaurus.io/zh-CN/docs)
+
+当我们配置好我们的静态站点之后，就可以打包上传我们的网站到服务器上了，然后通过 nginx 服务做代理转发，即可通过公网访问我们的站点了。具体操作如下：
+
+1.  在我们安装完 nginx 之后，需要再创建一个放置静态站点的目录，比如在 `/var/www`下新建一个 `html`的目录：`mkdir /var/www/html`&#x20;
+2.  然后通过 `scp` 将我们打包之后的项目上传到服务器：`scp -r <local_filepath> <service_name>@<service_ip>:<service_target_path>`
+3.  执行完上述操作之后，我们再回到命令行中并进入到 nginx 目录的 conf 目录下，修改一下 nginx 的配置文件：`vim nginx.conf`
+4.  主要修改 http 下的 server 下的 location
+
+```bash
+location / {
+  root /var/www/html;
+  index index.html
+}
+```
+
+修改完之后，保存退出并重载一下 nginx: `nginx -s reload`就打工告成了，此时我们输入公网IP就可以看到对应的静态站点了。
+
+### 服务端程序
+
+我们可以创建一个简单的 Node 项目来做演示。
+
+```js
+// www.js
+const http = require('http')
+const fs = require('fs')
+
+const server = http.createServer(() => {
+const html = fs.readFileSync('./src/index.html')
+  res.end(html)
+})
+
+server.listen(8000, () => {
+  console.log("server is running")
+})
+```
+
+再写好模板：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>部署Web项目</title>
+  </head>
+  <body>
+    <h1>如何从0到1上线一个 Web 项目</h1>
+  </body>
+</html>
+```
+
+将做好的 demo 打包并上传到服务器上，对于 MAC 来说是自带 SSH 的，而在 Windows 系统上，Win10 是自带的，Win10 以下可以自行百度进行安装。
+
+```bash
+scp -r <local_filepath> <service_name>@<service_ip>:<service_target_path>
+```
+
+上传好之后，对于压缩的文件我们进行解压即可。解压之后我们进入到项目目录中，并启动项目：`node www.js`。
+
+然后就可以通过服务器的公网IP进行访问了，这里访问时需要携带端口号。
+
+> ⚠️注意：如果访问不成功，可能是安全组中没有放开对当前端口号的访问权限，此时还需要到**安全组**添加一个入方向的访问规则，端口范围为当前服务的端口号，配置好之后再次访问项目地址就可以正常访问了
+
+但是！此时假如我们退出了服务，或者关闭了 workbench，那么再访问时会发现，网站又访问不了了，这是因为当我们执行了上述操作时，项目的服务就会被停掉了，毕竟它也不是处于后台运行的。
+
+> 当我们退出或者关掉终端连接时，它会把服务脚本也一起杀掉
+
+那么我们如何让它在后台进行运行呢？只要执行以下命令即可：
+
+```bash
+nohup node www.js &
+```
+
+这样我们就将这个 Web 服务放到了后台运行了。
+
+### 购买域名
+
+那我们也不能一直使用公网 IP 地址去访问我们的项目吧，此时我们还需要一个好看好听的域名来撑场面，搜索万网来购买一个自己喜欢的域名，购买成功之后到域名解析的控制台来做域名解析。这一步是需要备案的，不过现在可以直接在网上进行备案，一般一两天就OK。
+
+最后，我们就可以通过域名来访问我们的网站啦。
+

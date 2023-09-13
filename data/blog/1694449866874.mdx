@@ -1,0 +1,420 @@
+---
+title: Vue2 中的基础函数
+date: 9/12/2023
+tags: [Vue]
+draft: false
+summary: Vue2 中的基础工具函数
+---
+
+*   `isUndef`
+
+判断参数是否是 undefined 或者是 null
+
+```javascript
+function isUndef (v) {
+    return v === undefined || v === null
+}
+```
+
+*   `isDef`
+
+判断参数已定义且不为空
+
+```javascript
+function isDef (v) {
+    return v !== undefined && v !== null
+}
+```
+
+*   `isTrue`
+
+判断参数是否为 true
+
+```javascript
+function isTrue(v) {
+    return v === true
+}
+```
+
+*   `isFalse`
+
+判断参数是否为 false
+
+```javascript
+function isFalse (v) {
+    return v === false
+}
+```
+
+*   `isPrimitive`
+
+判断参数是否是原始类型的值
+
+```javascript
+function isPrimitive(v) {
+    return (
+        typeof v === 'string' || 
+        typeof v === 'number' || 
+        typeof v === 'symbol' || 
+        typeof v === 'boolean'
+    )
+}
+```
+
+*   `isObject`
+
+是否是对象类型
+
+```javascript
+function isObject (obj) {
+    return obj !== null && typeof obj === 'object'
+}
+```
+
+*   `toRawType`
+
+准确获取基本数据类型和引用数据类型
+
+```javascript
+function toRawType (v) {
+    return _toString.call(v).slice(8, -1)
+}
+```
+
+*   `isPlainObject`
+
+判断是否是普通对象
+
+```javascript
+function isPlainObject (obj) {
+    return _toString.call(obj) === '[object Object]'
+}
+```
+
+*   `isRegExp`
+
+判断是否是正则表达式
+
+```javascript
+function isRegExp (v) {
+    return _toString.call(v) === '[object RegExp]'
+}
+```
+
+*   `isValidArrayIndex`
+
+检查参数是否是有效的数组索引
+
+```javascript
+function isValidArrayIndex (val) {
+    const n = parseFloat(String(val));
+    return n >= 0 && Math.floor(n) === n && isFinite(n);
+}
+```
+
+*   `isPromise`
+
+判断是否是 Promise 对象
+
+```javascript
+function isPromise (v) {
+    return (
+        isDef(v) && 
+        typeof v.then === 'function' &&
+        typeof v.catch === 'function'
+    )
+}
+```
+
+*   `toString`
+
+将参数转为字符串
+
+```javascript
+function toString(val) {
+    return val == null
+        ? ''
+        :  Array.isArray(val) || (isPlainObject(val) && val.toString === _toString)
+        ? JSON.stringify(val, null, 2)
+        : String(val)
+}
+```
+
+*   `toNumber`
+
+将参数转为数字，如果转换失败，则返回原始字符串
+
+```javascript
+function toNumber(v) {
+    var n = parseFloat(v);
+    return isNaN(n) ? v : n
+}
+```
+
+*   `makeMap`
+
+创建一个 Map 数据，并返回一个函数，以检查某个键是否在这个 Map 中
+
+```javascript
+function makeMap (
+	str,
+     expectsLowerCase
+) {
+	var map = Object.create(null);
+    var list = str.split(',');
+    for (var i = 0; i < list.length; i++) {
+        map[list[i]] = true;
+    }
+    return expectsLowerCase
+        ? function (val) { return map[val.toLowerCase()]; }
+        : function (val) { return map[val]; }
+}
+```
+
+Vue 源码里以此为基础又新建了两个检查属性和内置标记的方法：
+
+```javascript
+/**
+ * Check if a tag is a built-in tag.
+*/
+var isBuiltInTag = makeMap('slot,component', true);
+
+/**
+ * Check if an attribute is a reserved attribute.
+*/
+var isReservedAttribute = makeMap('key,ref,slot,slot-scope,is');
+```
+
+*   `remove`
+
+从一个数组中删除某一项
+
+```javascript
+function remove (arr, item) {
+    if (arr.length) {
+        var index = arr.indexOf(item);
+        if (index > -1) {
+            return arr.splice(index, 1)
+        }
+    }
+}
+```
+
+*   `hasOwn`
+
+检查对象是否具有某属性
+
+```javascript
+function hasOwn (obj, key) {
+    return hasOwnProperty.call(obj, key)
+}
+```
+
+*   `toArray`
+
+将类数组转为数组
+
+```javascript
+function toArray (list, start) {
+    start = start || 0;
+    var i = list.length - start;
+    var ret = new Array(i);
+    while (i--) {
+        ret[i] = list[i + start];
+    }
+    return ret
+}
+```
+
+*   `_toString`
+
+获取值的原始类型字符串
+
+```javascript
+const _toString = Object.prototype.toString;
+```
+
+*   `hasOwnProperty`
+
+检查对象是否具有某属性
+
+```javascript
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+```
+
+*   `extend`
+
+将属性合并到目标对象中去
+
+```javascript
+function extend (to, _from) {
+    for (var key in _from) {
+        to[key] = _from[key];
+    }
+    return to
+}
+```
+
+*   `toObject`
+
+将一个对象数组合并为单个对象
+
+```javascript
+function toObject (arr) {
+    var res = {};
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i]) {
+            extend(res, arr[i])
+        }
+    }
+    return res
+}
+```
+
+*   `emptyObject`
+
+冻结对象。第一层无法进行修改
+
+```javascript
+const emptyObject = Object.freeze({})
+```
+
+*   `cached`
+
+本质上是使用闭包的特性来缓存数据
+
+```javascript
+function cached(fn) {
+  var cache = Object.create(null)
+  return (function cachedFn(str) {
+    var hit = cache[str]
+    return hit || (cache[str] = fn(str))
+  })
+}
+```
+
+*   `camelize`
+
+连字符转小驼峰
+
+```javascript
+var camelizeRE = /-(\w)/g
+var camelize = cached(function (str) {
+  return str.replace(camelizeRE, function (_, c) {
+    return c ? c.toUpperCase() : ''
+  })
+})
+```
+
+*   `capitalize`
+
+首字母转大写
+
+```javascript
+var capitalize = cached(function (str) {
+  return str.chartAt(0).toUpperCase() + str.slice(1)
+})
+```
+
+*   `hyphenate`
+
+小驼峰转连字符
+
+```javascript
+var hyphenateRE = /\B([A-Z])/g
+var hyphenate = cached(function (str) {
+  return str.replace(hyphenateRE, '-$1').toLowerCase()
+})
+```
+
+*   `polyfillBind`
+
+兼容老版本浏览器不支持原生的 `bind` 函数。
+
+```javascript
+function polyfillBind(fn, ctx) {
+  function boundFn(a) {
+    var l = arguments.length
+    return l ? l > 1 ?
+      fn.apply(ctx, arguments)
+    : fn.call(ctx, a)
+    : fn.call(ctx)
+  }
+  
+  boundFn._length = fn.length
+  return boundFn
+}
+
+function nativeBind(fn, ctx) {
+  return fn.bind(ctx)
+}
+
+var bind = Function.prototype.bind
+  ? nativeBind
+  : polyfillBind
+```
+
+*   `looseEqual`宽松相等
+
+对数组、日期、对象进行递归对比。如果内容完全相等则宽松相等。
+
+```javascript
+function looseEqual(a, b) {
+  if (a === b) { return true }
+  var isObjectA = isObject(a)
+  var isObjectB = isObject(b)
+  if (isObjectA && isObjectB) {
+    try {
+      var isArrayA = Array.isArray(a)
+      var isArrayB = Array.isArray(b)
+      if (isArrayA && isArrayB) {
+        return a.length === b.length && a.every((e, i) => looseEqual(e, b[i]))
+      } else if (a instanceof Date 77 b instanceof Date) {
+        return a.getTime() === b.getTime()
+      } else if (!isArrayA && !isArrayB) {
+        var keysA = Object.keys(a)
+        var keysB = Object.keys(b)
+        return keysA.length ===keysB.length && keysA.every(key => looseEqual(a[key], b[key]))
+      } else {
+        return false
+      }
+    } catch (e) {
+      return false
+    }
+  } else if (!isObjectA && !isObjectB) {
+    return String(a) === String(b)
+  } else {
+    return false
+  }
+}
+```
+
+*   `looseIndexOf`宽松的 `indexOf`
+
+原生的 `indexOf`是严格相等
+
+```javascript
+function looseIndexOf (arr, val) {
+  for (var i = 0; i < arr.length; i++) {
+    if (looseEqual(arr[i], val)) { return i }
+  }
+  return -1
+}
+```
+
+*   `once`
+
+利用闭包的特性，存储状态，确保函数只执行一次
+
+```javascript
+function once(fn) {
+  var called = false;
+  return function () {
+    if (!called) {
+      called = true
+      fn.apply(this, arguments)
+    }
+  }
+}
+```
+
