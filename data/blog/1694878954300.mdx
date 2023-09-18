@@ -1,0 +1,75 @@
+---
+title: 函数防抖和函数节流
+date: 9/18/2023
+tags: [JavaScript,前端,面试]
+draft: false
+summary: 函数节流高频触发事件，在 n 秒内只会执行一次，所以节流会稀释函数执行的频率。举个例子，古时候人们治水，一般都是直接用堵起来的水坝，把水堵住。但是后来发现，堵不如疏，你不能让水越聚越多，而是要选择减缓水流的速度。那么在 JS 中其实就在减少高频事件执行的频率，降低性能消耗。实现思路首先我们定义一个标记，当标记为 true 的时候执行函数，然后呢，我们在闭包里去判断如果这个标记为 fal..._js 一秒内不触发两次
+---
+
+### 函数节流
+
+> 高频触发事件，在 n 秒内只会执行一次，所以节流会稀释函数执行的频率。举个例子，古时候人们治水，一般都是直接用堵起来的水坝，把水堵住。但是后来发现，堵不如疏，你不能让水越聚越多，而是要选择减缓水流的速度。那么在 JS 中其实就在减少高频事件执行的频率，降低性能消耗。
+
+##### 实现思路
+
+> 首先我们定义一个标记，当标记为 true 的时候执行函数，然后呢，我们在闭包里去判断如果这个标记为 false 时，则直接 return 掉，不再向下执行。反之继续向下执行，并将这个标记立马赋值为 false，紧接着我们在 setTimeout 里将目标函数包装进来，并改变函数的 this 指向。为什么要改变 this 指向呢？是因为如果我们的目标函数里使用 this 后，如果没有改变 this 指向，那 this 会指向 window。再执行完目标函数以后，再跟着将标记重置为 true ，保证方法的执行。
+
+##### 示例代码
+
+```
+function throttle(fn, time) {
+	let flag = true;
+	return function (e) {
+		if (!flag) return;
+		flag = false;
+		setTimeout(() => {
+			fn.apply(this, arguments);
+			flag = true;
+		}, time)
+	}
+}
+
+function testScroll() {
+	console.log("函数节流~~~");
+}
+
+window.addEventListener('scroll', throttle(testScroll, 300))
+
+```
+
+函数节流的适用场景会在一些 scroll 事件，resize 事件中用到。
+
+### 函数防抖
+
+> 函数防抖的基本思路就是多个信号合并为一个信号；触发高频事件后 n 秒内函数只会执行一次，如果 n 秒内高频事件再次触发，则重新计算时间。也可以说是任何频繁触发的情况下，只有任务触发的间隔超过指定间隔的时候，任务才会执行。
+
+##### 实现思路
+
+> 将目标函数封装在 setTimeout 里面，然后再建一个方法 debounce，这个方法呢是某一个事件（oninput等）的回调函数，而在高频触发这个事件时，相对应的也会触发事件里的回调函数，此时，我们在回调里先定义一个 timeout 的变量，这个变量是用来赋值给 setTimeout的。然后通过闭包保存一个标记来保存setTimeout返回的值，里面第一步，先清除定时器 clearTimeout(timeout)，然后再把 setTimeout 写上，并将目标方法包装进去。\
+> 这样的话，当高频触发回调函数的时候，当次事件里的回调函数会把上次事件里的 定时器给清除掉，这样就不会去调用定时器里的目标函数（这是建立在事件还在继续触发的基础上）。而当用户不再触发这个事件的时候，clearTimeout 将上一次的定时器清除掉以后，紧接着执行 setTimeout，待设置好的时间间隔过去以后就可以触发目标函数了。
+
+##### 示例代码
+
+```
+function debounce (fn, time) {
+    var timeout;
+    return function () {
+        clearTimeout(timeout);
+        var _this = this, args = arguments;
+        timeout = setTimeout(function() {
+            fn.apply(_this, args)
+        }, time)
+    }
+}
+
+function test () {
+    console.log('函数防抖~~~')
+}
+
+var inputDom = document.getElementById('inputId');
+inputDom.addEventListener('input', debounce(test, 300))
+
+```
+
+一些第三方工具库，如 lodash 里就集成了函数防抖和节流。
+
