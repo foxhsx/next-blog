@@ -1,0 +1,276 @@
+---
+title: 常见的几种网页进度条及如何判断页面已经加载完毕
+date: 9/19/2023
+tags: [JavaScript,前端]
+draft: false
+summary: 介绍常见的几种网页进度条及如何判断页面已经加载完毕
+---
+
+首先推荐一个自动生成gif图标的一个网址：preloaders.net
+
+![](https://note.ihsxu.com/api/imgs/1695050957409.webp)
+
+在里面挑选好加载的效果图以后，点击下载：
+
+![](https://note.ihsxu.com/api/imgs/1695050968061.webp)
+
+下载完成以后把gif图片保存到你项目的img文件夹中，方便使用。
+
+## loading方法
+
+### 直接使用定时器
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>常见的网页进度条1</title>
+  <style>
+    .loading {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      background-color: #fff;
+    }
+
+    .loading .pic {
+      width: 64px;
+      height: 64px;
+      background: url(images/loading.gif);
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      margin: auto;
+    }
+  </style>
+  <script src="js/jquery-1.11.3.js"></script>
+  <script>
+    $(function () {
+      //可使用jquery动态添加遮罩及loading效果
+      // var loading = '<div class="loading"><div class="pic"></div></div>';
+      //$("body").append(loading);
+      //启动一个定时器
+      setInterval(function () {
+        $(".loading").fadeOut();//3秒之后影藏
+      }, 3000)
+    })
+  </script>
+</head>
+
+<body>
+  <div class="loading">
+    <div class="pic"></div>
+  </div>
+  <p>使用定时器的方法（不会判断页面加载，只是在定时器完成之后将也面显示出来）</p>
+  <img
+    src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536779145193&di=88f99c68903b47c4e386755b73893335&imgtype=0&src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fwallpaper%2F1212%2F21%2Fc2%2F16781720_1356079420979.jpg"
+    alt=""
+  />
+  <img
+    src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536779184701&di=f3ab80235c5ddf5adb9d6b06ce47e82c&imgtype=0&src=http%3A%2F%2Fattachments.gfan.com%2Fforum%2Fattachments2%2Fday_110730%2F110730052814920f360299a915.jpg"
+    alt=""
+  >
+  <img
+    src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536779211730&di=4c244c8bd60f74b1832625e27c063fc0&imgtype=0&src=http%3A%2F%2Fi3.download.fd.pchome.net%2Ft_960x600%2Fg1%2FM00%2F09%2F12%2FoYYBAFO6NYCIE0tSAAdYOvon7RoAABtkwF4hgIAB1hS650.jpg"
+    alt=""
+  >
+  <img
+    src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536779225935&di=4c13b2276bbe03877d4c5ea0cc56cc98&imgtype=0&src=http%3A%2F%2Fc15.eoemarket.net%2Fapp0%2F652%2F652549%2Fscreen%2F3260012.png"
+    alt=""
+  >
+  <img
+    src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536779271901&di=3ccda1af260cf969189de3f52ea31686&imgtype=0&src=http%3A%2F%2Fpic1.ytqmx.com%3A82%2F2015%2F0526%2F14%2F02.jpg%2521720.jpg"
+    alt=""
+  >
+  <img
+    src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536779311038&di=0599243d4fe87313ed37ee416cd73d6a&imgtype=0&src=http%3A%2F%2Fwww.desktx.cc%2Fd%2Ffile%2Fwallpaper%2Fscenery%2F20170105%2F2647448be73294d17c28d91407661f8c.jpg"
+    alt=""
+  >
+  <img
+    src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536779320074&di=ec9d10c18c21daec3b89b5573c22ef0f&imgtype=0&src=http%3A%2F%2Fpicture.ik123.com%2Fuploads%2Fallimg%2F170320%2F3-1F320150H5.jpg"
+    alt=""
+  >
+  <img
+    src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536779349967&di=11eaaee20a3da68abf58938bdad012e0&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F2017-11-29%2F5a1e13119deee.jpg"
+    alt=""
+  >
+</body>
+
+</html>
+
+```
+
+这种方法是直接给一个时间，等结束以后，加载效果消失。但是这种方法并不能判断页面是否已经加载完毕，虽然简单粗暴，但显然这并不是我们想要的结果；
+
+### 根据页面是否加载完毕来关闭loading效果
+
+首先，咱们要想知道页面是否加载完毕，需要知道以下几点：&#x20;
+
+1.  `document.onreadystatechange` 页面加载状态改变时的事件&#x20;
+2.  `document.readyState` 页面当前文档的状态
+
+    1.  `uninitialized` 还未开始载入
+    2.  `loading` 载入中
+    3.  `interactive` 已加载，文档和永和可以开始交互
+    4.  `complete` 载入完成
+
+这里我们就不使用定时器的那种方法了，我们直接来判断页面是否加载完毕去决定`loading`效果的关闭与否，那么直接将第一个方法的 `js` 改为：
+
+```javascript
+document.onreadystatechange = function () {//即在加载的过程中执行下面的代码
+  if (document.readyState == "complete") {//complete加载完成
+    $(".loading").fadeOut();
+  }
+}
+```
+
+这种方法是咱们用到的最多的方法了，因为它能判断出来页面是否真的已经加载完毕。
+
+### 用C3做进度条的效果
+
+这个就要用transform属性以及animation动画了，上面两个方法里，都是用的gif图，那么这样一个加载的效果我们用C3怎么去实现呢？\
+![](https://note.ihsxu.com/api/imgs/1695051420163.webp)\
+说下大概思路吧，首先你肯定得写一个容器把进度条装进去：
+
+```html
+<div class="loading">
+  <div class="pic">
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+  </div>
+</div>
+```
+
+然后再修改样式：
+
+```css
+.loading {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-color: #fff;
+}
+.loading .pic {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+}
+.loading .pic i {
+  display: block;
+  float: left;
+  width: 6px;
+  height: 50px;
+  background-color: #399;
+  margin: 0 2px;
+  transform: scaleY(0.4);
+  animation: load 1.2s infinite;
+}
+.loading .pic i:nth-child(1) {
+}
+.loading .pic i:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.loading .pic i:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.loading .pic i:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.loading .pic i:nth-child(5) {
+  animation-delay: 0.4s;
+}
+@keyframes load {
+  0%,
+  40%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  20% {
+    transform: scaleY(1);
+  }
+}
+```
+
+写好这些以后，动画就已经产生了。
+
+再下来将第二种方法的js粘贴过来，就达到了用CSS3来实现页面加载的一个动画效果了。
+
+### 还有一种加载方式时，实时获取加载数据，就是百分数的那种效果
+
+![](https://note.ihsxu.com/api/imgs/1695051657557.webp)
+
+这种效果在页面中也比较常见，也是用css3做的，代码如下：
+
+首先，先给一个容器用来装进度条：
+
+```html
+<div class="loading">
+  <div class="pic">
+    <span></span>
+    <b>0%</b>
+  </div>
+</div>
+```
+
+然后写对应的样式及动画：
+
+```css
+*{
+  margin:0;
+  padding: 0;
+}
+.loading{width: 100%;height: 100%;position: fixed;top:0;left: 0;z-index: 100;background-color: #fff;}
+.loading .pic{width: 100px;height: 100px;position: absolute;top: 0;left: 0;bottom: 0;right: 0;margin: auto;font-size: 30px;text-align: center;line-height: 100px;}
+.loading .pic span{display: block;width: 80px;height: 80px;position: absolute;top: 10px;left: 10px;border-radius: 50%;box-shadow: 0 3px 0 #666;animation: rotate 1s infinite linear;-webkit-animation: rotate 1s infinite linear;
+}
+@-webkit-keyframes rotate{
+  0%{-webkit-transform: rotate(0deg);}
+  100%{-webkit-transform: rotate(360deg);}
+}
+@keyframes rotate{
+  100%{transform: rotate(360deg);}
+}
+
+```
+
+那么现在打开浏览器以后呈现在眼前的是一个单调的转圈的动画，所以接下来我们还得写js：
+
+```javascript
+$(function () {
+  var img = $("img");//首先获取所有的Img对象
+  var num = 0;//定义一个变量，赋值给b标签用
+  img.each(function (i) {//遍历获取到的所有img
+    var oImg = new Image();//new一个新对象
+    oImg.onload = function () {//使用onload方法，在加载完成后执行
+      oImg.onload = null;//首先清除掉缓存
+      num++;//每次加载的过程中num++，即执行次数
+      $(".loading b").html(parseInt(num / $("img").size() * 100) + "%");//改变b标签的内容，用num除以img的个数，再乘以100，再取整，这就是加载的百分数
+      if (num >= i) {
+        $(".loading").fadeOut();//当num的值大于等于个数时隐藏
+      }
+    }
+    oImg.src = img[i].src;//预加载，先指定一个img.src，当onload成功以后可以将数据指定到某一个元素或者图片上，或者返回一个结果
+  })
+})
+```
+
+OK，完成（一定记得要引jQuery，当然用原生就不用引了）。
+
