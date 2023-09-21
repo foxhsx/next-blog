@@ -1,0 +1,99 @@
+---
+title: splice 方法删除不全的问题
+date: 9/21/2023
+tags: [JavaScript,前端,面试]
+draft: false
+summary: 在使用 splice 方法删除元素时，会触发一些特殊场景
+---
+
+### 场景
+
+在一个数组中，如果存在相邻的两个及以上相同元素，使用 `splice` 方法循环删除里面相同的元素，会发生删除不全的问题。如下：
+
+```html
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>splice()方法采坑</title>
+</head>
+
+<body>
+  <p id="text">添加和删除元素</p>
+  <button onclick="myFunction()">点击</button>
+  <script>
+    function myFunction() {
+      var arr = ["", "", "three", "four", "five", "six"];
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == "") {
+          arr.splice(i, 1)		//删除为空的值
+        }
+      }
+      console.log(arr)
+    }
+  </script>
+</body>
+
+</html>
+```
+
+最终得到的结果是 `["", "three", "four", "five", "six"]`，它前面还有一个空值！
+
+### 原因
+
+那为什么会产生这个问题呢？
+
+我们要知道 `splice` 方法实际上是会改变原数组的，也就是说，在循环过程中，只要执行了 `splice` 方法，数组本身就已经发生了改变。我们以上述代码为例来解释一下：
+
+1.  当第一次删除空值之后，实际上当前数组的长度已经发生了改变，从 6 变成了 5；
+2.  而后续的循环中，i 将会从 1开始，因为上一轮的 0 已经被执行过了
+3.  当下标从 1 开始时，新数组的第 0 项，也就是空字符串的那一项刚好被跳过，从而导致最终得到的结果里，还有一个空字符串存在
+
+### 解决
+
+那知道原因之后就好解决这个问题了。我们可以在 `splice` API 调用之后，将对应的 i 下标后退到上一个位置就可以了。修改过的代码如下：
+
+```js
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>splice()方法采坑</title>
+</head>
+
+<body>
+  <p id="text">添加和删除元素</p>
+  <button onclick="myFunction()">点击</button>
+  <script>
+    function myFunction() {
+      var arr = ["", "", "three", "four", "five", "six"];
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == "") {
+          arr.splice(i, 1)		//删除为空的值
+          i--;
+        }
+      }
+      console.log(arr)
+    }
+  </script>
+</body>
+
+</html>
+```
+
+这样就可以达到我们预期的效果了。
+
+实际上如果我们不纠结于 `splice` API 方法的话，可以使用 `filter` 更优雅的完成最终的效果。代码如下：
+
+```js
+function myFunction() {
+  const arr = ["", "", "three", "four", "five", "six"];
+  const filteredArr = arr.filter(item => item !== "");
+  console.log(filteredArr);
+}
+```
+
+这样，在不改变原数组的情况下，我们就可以获得一个预期的新的数组。
+
