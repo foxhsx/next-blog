@@ -1,0 +1,33 @@
+---
+title: 在 Vue2 中动态渲染组件的方法
+date: 9/27/2023
+tags: [Vue]
+draft: false
+summary: 在 Vue2 中如何实现动态渲染组建
+---
+
+在项目中，我们会经常遇到动态加载不同组件（内容）的场景，也就是想通过一个页面，根据不同的参数或者条件，来加载不同的内容。那在vue里，给大家提供了一个很简单的方法，使用component组件来实现以上功能：
+
+```html
+<component :is="变量"></component>
+<scrpit>
+  export default {
+    components: {
+      组件名
+    },
+    data () {
+      组件名： 组件名
+    },
+    computed: {
+      变量名 () {
+	if (条件成立) {
+	  return this.组件名
+	}
+    }
+  }
+}
+</script>
+```
+
+给一个变量，然后根据不同的条件给这个变量赋值不同的组件名，这样就能达到动态渲染组件的效果了。
+
