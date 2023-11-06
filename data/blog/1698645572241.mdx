@@ -1,12 +1,12 @@
 ---
 title: 你值得拥有的 VSCode 插件
-date: 11/6/2023
+date: 11/7/2023
 tags: [VSCode]
 draft: false
 summary: 推荐一些提高开发效率和好玩儿的插件
 ---
 
-### Better Comments
+### 1. Better Comments
 
 [地址](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments)
 
@@ -104,7 +104,7 @@ summary: 推荐一些提高开发效率和好玩儿的插件
 > *   bold：字体粗细
 > *   italic：斜体
 
-### ESLint
+### 2. ESLint
 
 ESLint 是用来检查我们代码语法及规范的检测工具，在 VSCode 中安装 ESLint 插件，可以减少开发当中的一些低级错误。
 
@@ -126,15 +126,21 @@ ESLint 是用来检查我们代码语法及规范的检测工具，在 VSCode �
 
 ![](https://note.ihsxu.com/api/imgs/1699065986093.webp)
 
-### Live Server
+### 3. Live Server
 
-简单点来说，它会提供一个本地开发服务器，当你安装好它之后，在编辑器的右下角的工具栏中会出现一个 ![](https://note.ihsxu.com/api/imgs/1699066881230.webp) 的按钮，点击这个按钮就可以启动一个本地服务。
+![](https://note.ihsxu.com/api/imgs/1699309826466.webp)
 
-然后，当我们修改 HTML、CSS 和 JavaScript 的时候，被打开的页面就会重新被加载。
+简单点来说，它会提供一个本地开发服务器，当你安装好它之后，在编辑器的右下角的工具栏中会出现一个「Go Live」的按钮，点击这个按钮就可以启动一个本地服务。
 
-![Live Server Demo VSCode](https://github.com/ritwickdey/vscode-live-server/raw/HEAD/images/Screenshot/vscode-live-server-animated-demo.gif "Live Server Demo VSCode")
+&#x20;![](https://note.ihsxu.com/api/imgs/1699066881230.webp)&#x20;
 
-### Turbo Console Log
+然后，当我们修改 HTML、CSS 和 JavaScript 的时候，被打开的页面就会重新被加载。简单点来说它允许开发者在浏览器中实时预览正在编写的网页。
+
+![](https://note.ihsxu.com/api/imgs/vscode-live-server-animated-demo.gif)
+
+### 4. Turbo Console Log
+
+![](https://note.ihsxu.com/api/imgs/1699309856975.webp)
 
 这是一个很棒的插件，它可以帮助我们自动生成 console.log，并携带文件名和行数，这样我们就可以清晰的分辨出来我们想要打印的日志是在哪个位置。
 
@@ -147,7 +153,9 @@ ESLint 是用来检查我们代码语法及规范的检测工具，在 VSCode �
 
 ![](https://note.ihsxu.com/api/imgs/1699067739201.webp)
 
-### GitLens
+### 5. GitLens
+
+![](https://note.ihsxu.com/api/imgs/1699309881226.webp)
 
 超级强大的一款 Git 相关的插件，在 VSCode 自带的 Git 功能的基础上增加了：
 
@@ -202,7 +210,124 @@ ESLint 是用来检查我们代码语法及规范的检测工具，在 VSCode �
 
 ![Interactive Rebase Editor](https://raw.githubusercontent.com/gitkraken/vscode-gitlens/main/images/docs/rebase.gif "Interactive Rebase Editor")
 
-*   内置了丰富的命令，这样就不用担心没记住 Git 命令了。
+*   内置了丰富的命令，这样就不用担心没记住 Git 命令了。`option + command + G + 斜杠`
 
-![Git Command Palette](https://raw.githubusercontent.com/gitkraken/vscode-gitlens/main/images/docs/git-command-palette.png "Git Command Palette")
+![](https://note.ihsxu.com/api/imgs/1699309062595.webp)
+
+### 6. Git Graph
+
+![](https://note.ihsxu.com/api/imgs/1699310365288.webp)
+
+使用过 SourceTree 工具的同学都知道，该应用提供了强大的可视化查看存储库的 Git 操作，而 `Git Graph`也和它一样，我们可以通过安装它来获得类似 SourceTree 的功能。
+
+只需要在安装之后点击如下图所示中的按钮即可：
+
+![](https://note.ihsxu.com/api/imgs/1699310420174.webp)
+
+然后我们就可以通过这个可视化插件，进行更新和提交代码，查看提交历史等操作了。
+
+![](https://note.ihsxu.com/api/imgs/git_graph.gif)
+
+> 实际上 Gitlens 中也有相似的功能，只不过它需要付费使用。
+
+### 7. Prettier
+
+![](https://note.ihsxu.com/api/imgs/1699310816801.webp)
+
+这是一款前端开发中常用的格式化代码的工具，目前支持：
+
+*   JavaScript
+*   React
+*   TypeScript
+*   json
+*   graphql
+*   handlebars
+
+### 8. Code Snippets
+
+代码片段类的插件有很多，比如：
+
+*   JavaScript (ES6) code snippets
+*   Reactjs code snippets
+*   HTML Snippets
+*   Vue 3 Snippets
+*   ……
+
+以 `Reactjs code snippets` 为例：
+
+![](https://note.ihsxu.com/api/imgs/react_code_snippets.gif)
+
+我们可以通过插件提供的快捷键，可以快速生成一些代码片段出来，这在开发中大大提高了开发效率。
+
+以下是 Reactjs Code snippets 中提供的快捷键：
+
+| Trigger  | Content                                                          |
+| :------- | :--------------------------------------------------------------- |
+| `rcc→`   | class component skeleton                                         |
+| `rrc→`   | class component skeleton with react-redux connect                |
+| `rrdc→`  | class component skeleton with react-redux connect and dispatch   |
+| `rccp→`  | class component skeleton with prop types after the class         |
+| `rcjc→`  | class component skeleton without import and default export lines |
+| `rcfc→`  | class component skeleton that contains all the lifecycle methods |
+| `rwwd→`  | class component without import statements                        |
+| `rpc→`   | class pure component skeleton with prop types after the class    |
+| `rsc→`   | stateless component skeleton                                     |
+| `rscp→`  | stateless component with prop types skeleton                     |
+| `rscm→`  | memoize stateless component skeleton                             |
+| `rscpm→` | memoize stateless component with prop types skeleton             |
+| `rsf→`   | stateless named function skeleton                                |
+| `rsfp→`  | stateless named function with prop types skeleton                |
+| `rsi→`   | stateless component with prop types and implicit return          |
+| `fcc→`   | class component with flow types skeleton                         |
+| `fsf→`   | stateless named function skeleton with flow types skeleton       |
+| `fsc→`   | stateless component with flow types skeleton                     |
+| `rpt→`   | empty propTypes declaration                                      |
+| `rdp→`   | empty defaultProps declaration                                   |
+| `con→`   | class default constructor with props                             |
+| `conc→`  | class default constructor with props and context                 |
+| `est→`   | empty state object                                               |
+| `cwm→`   | `componentWillMount method`                                      |
+| `cdm→`   | `componentDidMount method`                                       |
+| `cwr→`   | `componentWillReceiveProps method`                               |
+| `scu→`   | `shouldComponentUpdate method`                                   |
+| `cwup→`  | `componentWillUpdate method`                                     |
+| `cdup→`  | `componentDidUpdate method`                                      |
+| `cwun→`  | `componentWillUnmount method`                                    |
+| `gsbu→`  | `getSnapshotBeforeUpdate method`                                 |
+| `gdsfp→` | `static getDerivedStateFromProps method`                         |
+| `cdc→`   | `componentDidCatch method`                                       |
+| `ren→`   | `render method`                                                  |
+| `sst→`   | `this.setState with object as parameter`                         |
+| `ssf→`   | `this.setState with function as parameter`                       |
+| `props→` | `this.props`                                                     |
+| `state→` | `this.state`                                                     |
+| `bnd→`   | `binds the this of method inside the constructor`                |
+| `disp→`  | `MapDispatchToProps redux function`                              |
+
+其他 Code Snippets 的用法请自行查找哈。
+
+### 9. Material Theme Icons
+
+![](https://note.ihsxu.com/api/imgs/1699312577348.webp)
+
+这个插件的主要作用是为我们的文件和文件夹添加对应的图标，增强可视化效果和便于区分不同的文件分类，以及美观性。
+
+### 10. Code Spell Checker
+
+![](https://note.ihsxu.com/api/imgs/1699312971264.webp)
+
+对于英语比较薄弱的小伙伴来说，这个插件真的是福音，它可以检查你的单词拼写是否有错误。
+
+### 11. AI 提示类插件
+
+*   Tabnine
+*   通义灵码
+
+### 12. Template String Converter
+
+![](https://note.ihsxu.com/api/imgs/1699313576043.webp)
+
+当我们在字符串中输入 `${` 的时候，这个插件会帮我们自动将该字符串转换为模板字符串。
+
+![](https://note.ihsxu.com/api/imgs/template_converter.gif)
 
