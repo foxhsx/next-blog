@@ -1,0 +1,208 @@
+---
+title: 你值得拥有的 VSCode 插件
+date: 11/6/2023
+tags: [VSCode]
+draft: false
+summary: 推荐一些提高开发效率和好玩儿的插件
+---
+
+### Better Comments
+
+[地址](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments)
+
+让你的注释变得更加多彩的一款插件，可以根据不同的注释类型展示不同的颜色。
+
+![](https://note.ihsxu.com/api/imgs/1698677111907.webp)
+
+该插件自带有五种高亮的注释类型：
+
+*   红色 - !
+*   蓝色 - ?
+*   绿色 - \*
+*   橙色 - todo
+*   普通注释 - //
+
+![](https://note.ihsxu.com/api/imgs/1699023487050.webp)
+
+我们也可以自己添加一些注释类型，并设置颜色，具体步骤如下：
+
+1.  打开 VSCode 左下角的设置
+2.  然后点击设置界面右上角的文件图标，也就是 settings.json 文件
+3.  在上一步的 json 文件中添加 `better-comments.tags` 属性，在这个属性里我们来增加自定义的一些注释。
+4.  重启 VSCode 即可生效
+
+![](https://note.ihsxu.com/api/imgs/1699023879488.webp)
+
+```json
+{
+  "better-comments.tags":[
+        {
+            "tag": "!",
+            "color": "#FF2D00",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "?",
+            "color": "#3498DB",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "//",
+            "color": "#474747",
+            "strikethrough": true,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "todo",
+            "color": "#FF8C00",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "*",
+            "color": "#98C379",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "@",
+            "color": "#eccccf",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        }
+    ]
+}
+```
+
+![](https://note.ihsxu.com/api/imgs/1699024350372.webp)
+
+> 实际上除了颜色之外，我们可以看到还能设置：
+>
+> *   strikethrough：删除线
+> *   underline：下划线
+> *   backgroundColor：背景颜色
+> *   bold：字体粗细
+> *   italic：斜体
+
+### ESLint
+
+ESLint 是用来检查我们代码语法及规范的检测工具，在 VSCode 中安装 ESLint 插件，可以减少开发当中的一些低级错误。
+
+在安装好插件之后，它会先使用安装在打开的工作区文件夹中的 ESLint 库。如果没有，则向上查找全局安装的 ESLint。
+
+但是假如你没有在本地或者全局进行安装，那么在使用前，还得需要安装一下。
+
+*   本地安装：`npm i eslint -D`
+*   全局安装：`npm i eslint -g`
+
+在开发中使用时，还需要在根目录下新建 `.eslintrc`文件来进行具体规范的配置。而这个文件要怎么配置，我们可以参考[官方文档](https://eslint.org/docs/latest/rules/)。
+
+有些朋友在安装好插件之后，发现编辑器并没有像其他人的一样，给出提示，那是因为少配置了一些东西，我们同样打开 VSCode 的配置文件 `settings.json`，然后设置以下几个属性：
+
+*   `eslint.probe`：这个配置项是用来设置哪些语言类型可以被插件校验并激活高亮错误的提示，现在默认有 `["javascript","javascriptreact","typescript","typescriptreact","html","vue","markdown"]`
+*   `editor.codeActionsOnSave`：我们在保存代码时，编辑器会自动帮我们进行一些修复操作，我们在设置中搜索 `codeActionsOnSave`就可以看到对应的配置项。
+
+![](https://note.ihsxu.com/api/imgs/1699065918882.webp)
+
+![](https://note.ihsxu.com/api/imgs/1699065986093.webp)
+
+### Live Server
+
+简单点来说，它会提供一个本地开发服务器，当你安装好它之后，在编辑器的右下角的工具栏中会出现一个 ![](https://note.ihsxu.com/api/imgs/1699066881230.webp) 的按钮，点击这个按钮就可以启动一个本地服务。
+
+然后，当我们修改 HTML、CSS 和 JavaScript 的时候，被打开的页面就会重新被加载。
+
+![Live Server Demo VSCode](https://github.com/ritwickdey/vscode-live-server/raw/HEAD/images/Screenshot/vscode-live-server-animated-demo.gif "Live Server Demo VSCode")
+
+### Turbo Console Log
+
+这是一个很棒的插件，它可以帮助我们自动生成 console.log，并携带文件名和行数，这样我们就可以清晰的分辨出来我们想要打印的日志是在哪个位置。
+
+使用起来有两个步骤：
+
+1.  选择或悬停将要打印的变量
+2.  Windows 电脑按下 `Ctrl + Alt + L`，Mac 电脑按下 `Ctrl + option + L`
+
+然后在选中的变量的下一行就会被插入一条 `console.log`。
+
+![](https://note.ihsxu.com/api/imgs/1699067739201.webp)
+
+### GitLens
+
+超级强大的一款 Git 相关的插件，在 VSCode 自带的 Git 功能的基础上增加了：
+
+*   Blame, CodeLens, and Hovers：在当前行的末尾以及状态栏上的标注信息，可以看到对应的历史记录，当我们将鼠标悬停在上面的时候，还可以看到一些详细信息
+
+![](https://note.ihsxu.com/api/imgs/1699069510858.webp)
+
+*   每个文件顶部和每个代码块的开头都提示最近的更改以及作者
+
+![](https://note.ihsxu.com/api/imgs/1699226809059.webp)
+
+*   点击右上角的 「File Annotations」按钮，我们可以查看：
+
+    *   Blame annotations：当前文件中「谁写了哪一部分代码」；
+    *   Changes annotations：展示当前文件修改了哪些部分，在提交代码前，可以自行 Review；
+    *   Heatmap annotations：展示当前文件的
+
+![](https://note.ihsxu.com/api/imgs/1699227477890.webp)
+
+![](https://note.ihsxu.com/api/imgs/1699227507731.webp)
+
+![](https://note.ihsxu.com/api/imgs/1699227523844.webp)
+
+> 再次点击右上角已经变成红色的「File Annotations」按钮，即可恢复到编辑状态。
+
+![](https://note.ihsxu.com/api/imgs/1699227628361.webp)
+
+![](https://note.ihsxu.com/api/imgs/1699227660512.webp)
+
+*   Revision Navigation：快速查看当前文件的历史记录，并以 compare 的形式展示出来。
+
+![](https://note.ihsxu.com/api/imgs/1699227963084.webp)
+
+*   在 Git 工作区，还增加了一些其他的功能：
+
+    *   Commits：当前分支提交历史记录的列表，包括未推送的更改、上游状态、快速比较等。
+    *   File History：浏览文件、文件夹或选定行的修订历史记录。
+    *   Branches：管理和导航分支。
+    *   Remotes：管理和导航远程分支。
+    *   Stashes：保存和恢复当前尚未准备好提交的更改。
+    *   Tags：管理和导航远程打的 Tag。
+    *   WorkTrees：一个收费功能，感兴趣的可以自行了解。
+    *   Search & Compare：搜索和探索特定的提交、消息、作者、更改的文件，甚至特定的代码更改，或可视化分支、标签、提交等之间的比较。
+
+![](https://note.ihsxu.com/api/imgs/1699228582848.webp)
+
+*   可以使用可视化的方式进行 rebase 操作
+
+    *   将 VS Code 设置为默认 Git 编辑器：`git config --global core.editor "code --wait"`
+    *   或者，如果只影响变基，请将 VS Code 设置为 Git 变基编辑器：`git config --global sequence.editor "code --wait"`
+    *   当我们在终端执行 `git rebase -i` 时，我们就可以看到下图所示的画面
+
+![Interactive Rebase Editor](https://raw.githubusercontent.com/gitkraken/vscode-gitlens/main/images/docs/rebase.gif "Interactive Rebase Editor")
+
+*   内置了丰富的命令，这样就不用担心没记住 Git 命令了。
+
+![Git Command Palette](https://raw.githubusercontent.com/gitkraken/vscode-gitlens/main/images/docs/git-command-palette.png "Git Command Palette")
+
