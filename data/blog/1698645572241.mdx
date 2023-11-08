@@ -1,6 +1,6 @@
 ---
 title: 你值得拥有的 VSCode 插件
-date: 11/7/2023
+date: 11/8/2023
 tags: [VSCode]
 draft: false
 summary: 推荐一些提高开发效率和好玩儿的插件
@@ -248,61 +248,126 @@ ESLint 是用来检查我们代码语法及规范的检测工具，在 VSCode �
 代码片段类的插件有很多，比如：
 
 *   JavaScript (ES6) code snippets
-*   Reactjs code snippets
+*   ES7+ React/Redux/React-Native snippets
 *   HTML Snippets
 *   Vue 3 Snippets
 *   ……
 
-以 `Reactjs code snippets` 为例：
+以 `ES7+ React/Redux/React-Native snippets` 为例：
 
-![](https://note.ihsxu.com/api/imgs/react_code_snippets.gif)
+1.  使用 `CMD + Shift + R` 快速唤出命令
+2.  选择我们想要使用的 code snippets，比如 rafc
+
+![](https://note.ihsxu.com/api/imgs/code_gif.gif)
 
 我们可以通过插件提供的快捷键，可以快速生成一些代码片段出来，这在开发中大大提高了开发效率。
 
-以下是 Reactjs Code snippets 中提供的快捷键：
+以下是该插件中提供的 React Component 快捷键：
 
-| Trigger  | Content                                                          |
-| :------- | :--------------------------------------------------------------- |
-| `rcc→`   | class component skeleton                                         |
-| `rrc→`   | class component skeleton with react-redux connect                |
-| `rrdc→`  | class component skeleton with react-redux connect and dispatch   |
-| `rccp→`  | class component skeleton with prop types after the class         |
-| `rcjc→`  | class component skeleton without import and default export lines |
-| `rcfc→`  | class component skeleton that contains all the lifecycle methods |
-| `rwwd→`  | class component without import statements                        |
-| `rpc→`   | class pure component skeleton with prop types after the class    |
-| `rsc→`   | stateless component skeleton                                     |
-| `rscp→`  | stateless component with prop types skeleton                     |
-| `rscm→`  | memoize stateless component skeleton                             |
-| `rscpm→` | memoize stateless component with prop types skeleton             |
-| `rsf→`   | stateless named function skeleton                                |
-| `rsfp→`  | stateless named function with prop types skeleton                |
-| `rsi→`   | stateless component with prop types and implicit return          |
-| `fcc→`   | class component with flow types skeleton                         |
-| `fsf→`   | stateless named function skeleton with flow types skeleton       |
-| `fsc→`   | stateless component with flow types skeleton                     |
-| `rpt→`   | empty propTypes declaration                                      |
-| `rdp→`   | empty defaultProps declaration                                   |
-| `con→`   | class default constructor with props                             |
-| `conc→`  | class default constructor with props and context                 |
-| `est→`   | empty state object                                               |
-| `cwm→`   | `componentWillMount method`                                      |
-| `cdm→`   | `componentDidMount method`                                       |
-| `cwr→`   | `componentWillReceiveProps method`                               |
-| `scu→`   | `shouldComponentUpdate method`                                   |
-| `cwup→`  | `componentWillUpdate method`                                     |
-| `cdup→`  | `componentDidUpdate method`                                      |
-| `cwun→`  | `componentWillUnmount method`                                    |
-| `gsbu→`  | `getSnapshotBeforeUpdate method`                                 |
-| `gdsfp→` | `static getDerivedStateFromProps method`                         |
-| `cdc→`   | `componentDidCatch method`                                       |
-| `ren→`   | `render method`                                                  |
-| `sst→`   | `this.setState with object as parameter`                         |
-| `ssf→`   | `this.setState with function as parameter`                       |
-| `props→` | `this.props`                                                     |
-| `state→` | `this.state`                                                     |
-| `bnd→`   | `binds the this of method inside the constructor`                |
-| `disp→`  | `MapDispatchToProps redux function`                              |
+#### rafc
+
+```javascript
+import React from 'react'
+
+export const $1 = () => {
+  return <div>$0</div>
+}
+```
+
+#### rafce
+
+```javascript
+import React from 'react'
+
+const $1 = () => {
+  return <div>$0</div>
+}
+
+export default $1
+```
+
+#### rmc
+
+```javascript
+import React, { memo } from 'react'
+
+export default memo(function $1() {
+  return <div>$0</div>
+})
+```
+
+#### rmcp
+
+```javascript
+import React, { memo } from 'react'
+import PropTypes from 'prop-types'
+
+const $1 = memo(function $1(props) {
+  return <div>$0</div>
+})
+
+$1.propTypes = {}
+
+export default $1
+```
+
+#### rcredux
+
+```javascript
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+
+export class FileName extends Component {
+  render() {
+    return <div>$4</div>
+  }
+}
+
+const mapStateToProps = (state) => ({})
+
+const mapDispatchToProps = {}
+
+export default connect(mapStateToProps, mapDispatchToProps)(FileName)
+```
+
+#### rcreduxp
+
+```javascript
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+
+export class FileName extends Component {
+  static propTypes = {
+    $2: $3,
+  }
+
+  render() {
+    return <div>$4</div>
+  }
+}
+
+const mapStateToProps = (state) => ({})
+
+const mapDispatchToProps = {}
+
+export default connect(mapStateToProps, mapDispatchToProps)(FileName)
+```
+
+#### rfcredux
+
+    import React, { Component } from 'react'
+    import { connect } from 'react-redux'
+
+    export const FileName = () => {
+      return <div>$4</div>
+    }
+
+    const mapStateToProps = (state) => ({})
+
+    const mapDispatchToProps = {}
+
+    export default connect(mapStateToProps, mapDispatchToProps)(FileName)
 
 其他 Code Snippets 的用法请自行查找哈。
 
@@ -321,7 +386,28 @@ ESLint 是用来检查我们代码语法及规范的检测工具，在 VSCode �
 ### 11. AI 提示类插件
 
 *   Tabnine
+
+![](https://note.ihsxu.com/api/imgs/1699400957378.webp)
+
+安装好之后，会提示需要我们登录，这个时候就要到 Tabnine 的官网注册账号然后登录了。我们可以使用 Github 账号进行登录。
+
+登录好之后它会提示你：
+
+![](https://note.ihsxu.com/api/imgs/1699401149899.webp)
+
+然后回到编辑器，在后面开发的时候，它就可以帮助我们进行一些智能提示了
+
+![](https://note.ihsxu.com/api/imgs/1699401303479.webp)
+
+当然你也可以将自己想要的功能写在注释里，它会自动帮忙完成
+
+![](https://note.ihsxu.com/api/imgs/1699401817321.webp)
+
 *   通义灵码
+
+![](https://note.ihsxu.com/api/imgs/1699401979675.webp)
+
+这是阿里巴巴刚出的新产品，在云栖大会上也是让人眼前一亮，不过我在安装的时候提示和当前的 VSCode 版本不兼容而导致安装不上，安装过的小伙伴可以在评论区分享一下。
 
 ### 12. Template String Converter
 
