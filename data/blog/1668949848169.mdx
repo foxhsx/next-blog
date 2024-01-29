@@ -1,6 +1,6 @@
 ---
 title: npm-镜像源
-date: 9/21/2023
+date: 1/29/2024
 tags: [node]
 draft: false
 summary: 记录配置 npm 镜像源
@@ -54,4 +54,16 @@ npmMirror ---- https://skimdb.npmjs.com/registry/
 nrm use taobao
 ```
 
+**需要注意的是**，2024年1月22日，淘宝镜像域名（<https://registry.npm.taobao.org> ）已经过期了。我们再使用这个镜像源就会报错。而在 2021 年的时候，淘宝就发文称 npm 镜像源的域名已经切换到了<https://registry.npmmirror.com> ，但是直到 2024年的1月22日之前旧的域名并不会影响正常使用，直到现在过期。
+
+所以我们现在如果遇到拉取依赖超时或者报错的情况，直接将 npm 镜像源切换到新的域名即可：
+
+```bash
+// 1. 清空缓存
+npm cache clean --force
+// 2. 切换新源
+npm config set registry https://registry.npmmirror.com
+```
+
+这样再次进行拉取就不会再有上述问题了。
 
