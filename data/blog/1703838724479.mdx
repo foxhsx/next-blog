@@ -1,0 +1,68 @@
+---
+title: 使用 Docker 搭建 IT-tools
+date: 2/5/2024
+tags: [docker]
+draft: false
+summary: 使用 Docker 搭建 IT-tools，程序员的提效利器
+---
+
+it-tools 里集成了很多的小工具。
+
+### docker
+
+```bash
+docker pull corentinth/it-tools
+
+docker run -d \
+   --restart unless-stopped \
+   --name it-tools \
+   -p 3075:80 \
+   corentinth/it-tools:latest
+```
+
+### docker compose
+
+```yaml
+version: '3.9'
+services:
+    it-tools:
+        image: 'corentinth/it-tools:latest'
+        ports:
+            - '3075:80'
+        container_name: it-tools
+        restart: unless-stopped
+```
+
+### k8s
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: it-tools
+  name: it-tools
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: it-tools
+  template:
+    metadata:
+      labels:
+        app: it-tools
+    spec:
+      containers:
+        - image: 'corentinth/it-tools:latest'
+          imagePullPolicy: Always
+          name: it-tools
+      restartPolicy: Always
+```
+
+以上每个标题对应不同的执行环境。
+
+部署好之后即可输入公网IP+端口号进行访问了：
+
+![](https://note.ihsxu.com/api/imgs/1707121650668.webp)
+
