@@ -1,23 +1,40 @@
 ---
 title: 使用 Docker 搭建 IT-tools
-date: 2/5/2024
+date: 2/7/2024
 tags: [docker]
 draft: false
 summary: 使用 Docker 搭建 IT-tools，程序员的提效利器
 ---
 
-it-tools 里集成了很多的小工具。
+作为一个开发人员，在平时的开发中，可能需要用到很多工具来协助我们开发，比如：
+
+*   格式化 JSON 字符串
+*   YAML 格式化
+*   加密/解密文本
+*   Base64 文件转换器
+*   JSON 转 YAML
+*   YAML 转 JSON
+*   URL 解析器
+*   JWT 解析器
+*   JSON 差异对比器
+*   文本比较
+
+等等等等，而这些都被集成到了 it-tools 里，我们可以选择在自己的服务器上使用 docker 快速一件部署，也可以直接使用原作者部署好的地址 [it-tools](https://it-tools.tech/)。
+
+接下来，我将介绍如何使用 docker、docker compose 和 k8s 来进行部署。
+
+> 这里我们在拉取镜像是时候，使用 nightly 分支，因为这个分支上有完整的中文，latest 上的中文，只有左上角的标题
 
 ### docker
 
 ```bash
-docker pull corentinth/it-tools
+docker pull corentinth/it-tools:nightly
 
 docker run -d \
    --restart unless-stopped \
    --name it-tools \
    -p 3075:80 \
-   corentinth/it-tools:latest
+   corentinth/it-tools:nightly
 ```
 
 ### docker compose
@@ -64,5 +81,5 @@ spec:
 
 部署好之后即可输入公网IP+端口号进行访问了：
 
-![](https://note.ihsxu.com/api/imgs/1707121650668.webp)
+![](https://note.ihsxu.com/api/imgs/1707299766747.webp)
 
