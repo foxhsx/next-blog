@@ -1,0 +1,140 @@
+---
+title: 使用 Docker 搭建碎片化知识卡片-Memos
+date: 2/20/2024
+tags: [docker]
+draft: false
+summary: Memos 是一个功能全面、易于使用的开源知识库和社交平台。它不仅适合个人记录和分享信息，也适合企业或组织作为内部的知识管理工具。Memos 的活跃开发和多元化功能使其成为维护私密性和安全性的理想选项。
+---
+
+### 介绍
+
+Memos 是一个功能全面、易于使用的开源知识库和社交平台。它不仅适合个人记录和分享信息，也适合企业或组织作为内部的知识管理工具。Memos 的活跃开发和多元化功能使其成为维护私密性和安全性的理想选项。
+
+它旨在为用户提供一个方便的记录、分享和管理知识的环境，同时注重保护用户数据的私密性和安全性。
+
+它具备以下功能：
+
+*   支持标签、过滤、搜索和多账户管理。
+*   可自定义备忘录可见性，有多种隐私设置选项。
+*   提供多样化的后端存储选择，如数据库、S3 和本地存储。
+*   支持多种单点登录选项，包括 Github、Gitlab 和 Google 等，以及自定义认证方法。
+*   增强的用户界面(UI)，新的时间线页面和改进的深色模式。
+*   升级 Markdown 解析器支持扩展语法，如表格(table)和 LaTeX。
+*   支持通过 Docker 部署，允许无损数据的版本更新。
+*   可用于搭建独立微博，满足用户对 self-host 微博的需求。
+
+![](https://note.ihsxu.com/api/imgs/1708423049298.webp)
+
+### 使用 docker 快速部署
+
+#### 安装
+
+```bash
+docker pull neosmemo/memos
+```
+
+#### 运行
+
+```bash
+docker run -d --name memos -p 5230:5230 -v ~/.memos/:/var/opt/memos ghcr.io/usememos/memos:latest
+```
+
+然后我们就可以使用 ip + 端口的形式来访问 memos 应用了。
+
+### 在 k8s 中部署
+
+第一，在我们的 k8s 集群上新建一个文件，文件名比如叫 `memos-deployment.yaml`，然后将下面这段 yaml 内容 copy 进去；
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: memos
+  name: memos
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: memos
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: memos
+    spec:
+      containers:
+        - image: 'ghcr.io/neosmemo/memos:latest'
+          imagePullPolicy: Always
+          name: memos
+          ports:
+            - containerPort: 5230
+              name: memeos
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+      restartPolicy: Always
+```
+
+第二，在终端中 cd 到 `memos-deployment.yaml` 文件的目录，并执行下面这段命令进行应用部署：
+
+```bash
+kubectl apply -f memos-deployment.yaml
+```
+
+第三，我们可以使用以下命令来查看部署状态：
+
+```bash
+kubectl rollout status deployment/memos
+```
+
+第四，为了进一步检查，确认 pod 是否成功运行，可以使用以下命令：
+
+```bash
+kubectl get pods -l app=memos
+```
+
+> `-l app=memos` 这一部分是一个标签选择器，用来只挑选出拥有`app=memos`标签的 pods，这样就只会显示你刚刚部署的应用的 pods。
+>
+> 此时已经部署完成了，但是外界还无法访问，因为默认情况下 pod 不会被分配一个可以从集群外访问的 IP 地址，所以还需要创建一个 Service 来连接外界和这个 pod，这里多说比较复杂。因为对于个人来说使用 k8s 集群的概率极低（大都应该是学习），所以只需要会使用 docker 进行部署即可。
+>
+> 而在企业级维度，一般都会使用各大云厂商提供的 k8s 服务，比如阿里云 ACK 等，使用这种白屏化界面部署这些开源应用简直不要太简单，就不过多赘述了。
+
+### 使用
+
+部署好之后，我们输入 ip + 端口，首先会看到一个注册页面，这里我们注册一个用户：
+
+![](https://note.ihsxu.com/api/imgs/1708428340433.webp)
+
+注册好之后，我们就会跳转到主页面，它长这个样子：
+
+![](https://note.ihsxu.com/api/imgs/1708428461629.webp)
+
+默认进来之后又成了英文，接下来我们到 Settings 中将语言设置成中文。
+
+![](https://note.ihsxu.com/api/imgs/1708428856931.webp)
+
+之后我们点击主页就可以开始记录笔记了：
+
+![](https://note.ihsxu.com/api/imgs/1708439629019.webp)
+
+移动端也很清爽：
+
+![](https://note.ihsxu.com/api/imgs/1708440749646.webp)
+
+相较于手机记事本、备忘录及一些其他笔记软件来说，memos 的优点很显而易见：
+
+*   **开源且永久免费**，只要你有一台服务器，你就可以自由地使用和修改软件，不受任何限制。
+*   按照教程使用 Docker 进行傻瓜式部署，**简单几步，轻松安装**。
+*   Memos 的界面简洁直观、易于上手，只要有浏览器，在**任何一台联网设备上都可以进行访问**。
+*   Memos的轻量级特点使得其**占用资源较少，运行速度快**，我们在手机端或者电脑端都能快速打开。
+*   不但如此，我们还可以**将备忘录分享给他人**，增强了笔记的个性化和实用性。
+
