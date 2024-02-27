@@ -1,0 +1,60 @@
+---
+title: 使用 Docker 部署一键部署各种免费 GPT！
+date: 2/28/2024
+tags: [AI,Docker]
+draft: false
+summary: 这次要介绍的 AI 项目在 Github 高达 53.9k，它可以免费使用 GPT-3.5、GPT4、Llama、gemini-pro 等等19种大模型，简直恐怖如斯！
+---
+
+这次要介绍的 AI 项目在 Github 高达 53.9k，它可以免费使用 GPT-3.5、GPT4、Llama、gemini-pro 等等19种大模型，简直恐怖如斯！！
+
+它就是 `gpt4free`，[github 地址](https://github.com/xtekky/gpt4free)。
+
+![](https://note.ihsxu.com/api/imgs/1709052598719.webp)
+
+### 如何部署
+
+作者 xtekky 提供了 docker 镜像使得我们可以利用 docker 一键部署启动。只需要运行下面两条命令：
+
+````bash
+docker pull hlohaus789/g4f
+
+docker run -p 8080:8080 -p 1337:1337 -p 7900:7900 --shm-size="2g" hlohaus789/g4f:latest```
+````
+
+> 其中：
+>
+> *   8080 端口用于客户端聊天界面
+> *   1337 端口用于 API 服务
+> *   7900 端口则为可选的远程桌面接入
+
+启动好之后，我们就可以通过 IP + 端口（8080）的形式来访问项目了，它的 UI 界面长这样：
+
+![](https://note.ihsxu.com/api/imgs/1709052663165.webp)
+
+和市面上大多数的 chat 一样，左边展示聊天历史，右边是主体对话框。在右边的输入框下方我们可以看到五个操作项，分别是：
+
+\- Model：用来选择大模型的地方
+
+![](https://note.ihsxu.com/api/imgs/1709052694822.webp)
+
+\- Provider：用来选择使用哪家供应商，可以看到里面有 Bing、OpenAI 和 Gemini 等等众多的选项
+
+![](https://note.ihsxu.com/api/imgs/1709052721936.webp)
+
+\- Web Access：是否可以访问网络
+
+\- Image Generator：生成图片
+
+\- Disable History：不生成对话历史
+
+gpt4free 的主要原理主要是通过使用 Python 和 JavaScript 逆向工程来伪装成可正常使用 Openai 服务的网站，然后间接地调用 OpenAI。
+
+不过呢，由于一些 AI 国内还是访问不了，所以大多数情况下，我们可能遇到的是下面这种情况：
+
+![](https://note.ihsxu.com/api/imgs/1709052820385.webp)
+
+但这也可以通过其他方式来解决。整体来说，项目很有趣，属于聚合白嫖怪，使用时全靠运气（毕竟也不知道那个供应商能正常调通）。
+
+大家感兴趣的话可以自己试试看。
+
