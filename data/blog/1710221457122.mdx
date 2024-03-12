@@ -1,0 +1,54 @@
+---
+title: 如何免费获取 ChatGPT API Key？
+date: 3/12/2024
+tags: [AI]
+draft: false
+summary: 如何免费获取 ChatGPT API Key？
+---
+
+上一篇文章中我们介绍了 NextChat 项目，只需要配置好 ChatGPT API Key 就可以拥有私人 ChatGPT 网页应用。
+
+今天我们衔接上篇，给大家介绍一下免费获取 ChatGPT API Key 的来源——[GPT\_API\_free](https://github.com/chatanywhere/GPT_API_free)，它也是 Github 上开源的一个项目，至今已经有 13.6K 的 Star。
+
+![](https://note.ihsxu.com/api/imgs/1710252942812.webp)
+
+### 如何使用
+
+⚠️由于频繁的恶意请求，GPT\_API\_free 不再直接提供公共的免费 Key。而是需要使用 Github 账号进行绑定才可以领取。
+
+1.  登录 Github 并访问该项目
+2.  在 README.md 中找到「申请领取内测免费 API Key」链接，点击后进行 Github 授权即可获得 API Key
+
+![](https://note.ihsxu.com/api/imgs/1710252995843.webp)
+
+没错！只需要两步就可以获得免费的 API Key 了👍😍。
+
+### 配合 NextChat
+
+有了 Key 之后，按照上一篇文章中说的，就可以在：
+
+1.  部署了 NextChat 之后在页面中配置
+2.  也可以在使用 Docker 部署 NextChat 的时候用参数的形式进行配置。
+
+个人推荐第二种方式，这样就不用每次访问项目的时候都配置一次了。
+
+在 GPT\_API\_free 中也有提供 API 的转发 Host，我们在使用 docker 部署 NextChat 时可以一起配置进去，否则后面还要在 NextChat 提供的页面中进行配置。
+
+> 主要不配置转发 Host，也用不了
+
+```bash
+docker run -d -p 3000:3000 \
+   -e OPENAI_API_KEY=sk-xxxx \
+   -e CODE=页面访问密码 \
+   -e BASE_URL=转发 Host \
+   yidadaa/chatgpt-next-web
+```
+
+### 免费版限制
+
+免费版支持 `gpt-3.5-turbo`，`embedding`，`gpt-4`。其中 **gpt-4** 由于价格过高，**每天限制3次调用**（0点刷新），且不支持流式传输。需要更稳定快速的 `gpt-4` 可以选择使用他们提供的付费版。
+
+### 持久运营 GPT\_API\_free
+
+说简单一点，虽然 GPT\_API\_free 能给大家提供免费的 API Key，但是项目本身也是有日常开销的，所以它还提供了付费版 API。感兴趣的可以了解一下，维护项目不易，有能力也可以支持一下作者哦～
+
