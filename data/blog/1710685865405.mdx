@@ -1,0 +1,126 @@
+---
+title: coze-discord-proxy 让我实现免费使用 DELL-3 画图
+date: 3/21/2024
+tags: [AI]
+draft: false
+summary: 实现代理 Discord 对话 Coze-Bot，实现以 API 形式请求 GPT4 模型，提供对话、文生图、图生文、知识库检索等功能
+---
+
+最近出了很多免费上手 ChatGPT 的文章，但是却一直无法实现画图功能。之前有尝试过 Dreamina，但是结果有点差人强意。
+
+不过还好今天在逛 Github 时发现了 coze-discord-proxy 这个开源项目，感觉很惊喜，有了它，我就可以接入国际版的 Coze 实现在国内免费使用 DELL-3 画图了～😌。
+
+### 第一步：学习 coze-discord-proxy
+
+[Github 地址](https://github.com/deanxv/coze-discord-proxy)
+
+coze-discord-proxy 它能实现代理 Discord 对话 Coze-Bot，实现以 API 形式请求 **GPT4** 模型，提供对话、**文生图**、**图生文**、知识库检索等功能。并提供了三种部署方式：
+
+*   docker-compose
+*   docker
+*   部署到第三方平台
+
+部署完成之后，再结合之前有提过的 NextChat 或者 ChatBox，即可实现**国内免费使用 GPT4 和 DELL-3**。
+
+### 第二步：如何使用
+
+1.打开 [discord官网](https://discord.com/app) ,登陆后点击**设置-高级设置-开发者模式-打开**。
+
+![](https://note.ihsxu.com/api/imgs/1710862723934.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710862752124.webp)
+
+2.**创建 discord 服务器**，右键点击此服务器选择`复制服务器ID(GUILD_ID)`并记录，在此服务器中创建默认频道（常规），右键点击此频道选择`复制频道ID(CHANNEL_ID)`并记录。
+
+![](https://note.ihsxu.com/api/imgs/1710862819688.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710862895004.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710862910382.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710862939667.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710862960884.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710862975430.webp)
+
+3.打开 [discord开发者平台](https://discord.com/developers/applications) 登陆。
+
+4.创建新应用- Bot 即`COZE-BOT`，并记录该 bot 专属的`token`和`id(COZE_BOT_ID)`，此 bot 为即将被 coze 托管的 bot。
+
+![](https://note.ihsxu.com/api/imgs/1710891935163.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710892208009.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710892255272.webp)
+
+5.创建新应用-Bot即`CDP-BOT`，并记录该 bot 专属的`token(BOT_TOKEN)`，此 bot 为监听 discord 消息的 bot。
+
+![](https://note.ihsxu.com/api/imgs/1710892364084.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710892396303.webp)
+
+⚠️**还需要注意的一点是，对于 coze bot 来说，需要将这三项也开启，否则 coze 在接入 discord 时会导致失败**：
+
+![](https://note.ihsxu.com/api/imgs/1710951354485.webp)
+
+6.两个 bot 开通对应权限(`Administrator`)并邀请进创建好的 discord 服务器 。按照下图所示：
+
+*   **选中「applications.commands」和「bot」，注意只有选中 bot 的时候，下方才会展示 Bot Permissions**
+*   **然后我们再选择里面的「Administrator」**
+*   **最后点击页面最底部的 Copy 来复制生成的链接**
+
+![](https://note.ihsxu.com/api/imgs/1710947431681.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710947775183.webp)
+
+> 当然如果大家嫌麻烦可以直接使用这个地址，只需要将 client\_id 改成你自己的即可：`https://discord.com/oauth2/authorize?client_id=1218846847192404021&permissions=8&scope=applications.commands+bot`&#x20;
+
+记得要将两个 bot 都邀请进 discord 服务器。
+
+7.打开 [discord官网](https://discord.com/app)进入服务器，**按 F12 打开开发者工具**，在任一频道内发送一次消息，在开发者工具-`Network`中找到请求 `https://discord.com/api/v9/channels/1206*******703/messages`从该接口 header 中获取`Authorization(USER_AUTHORIZATION)`并记录。
+
+![](https://note.ihsxu.com/api/imgs/1710947954888.webp)
+
+8.打开 [coze官网](https://www.coze.com/) 创建 bot 并进行个性化配置（可以参考我之前的文章）。
+
+![](https://note.ihsxu.com/api/imgs/1710949009798.webp)
+
+9.配置好后选择发布到 discord，填写`COZE-BOT`的`token`，发布完成后在 discord 服务器中可看到`COZE-BOT`在线并可以`@`使用。
+
+![](https://note.ihsxu.com/api/imgs/1710948939699.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710949108316.webp)
+
+10.使用上述记录的参数开始配置 [环境变量 ](https://github.com/deanxv/coze-discord-proxy/blob/main/README.md#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F)并 [部署 ](https://github.com/deanxv/coze-discord-proxy/blob/main/README.md#%E9%83%A8%E7%BD%B2)本项目。我这边选择部署到第三方平台 Zeabur 上，每个月免费的额度也够用了，如何部署请看[部署到第三方平台](https://github.com/deanxv/coze-discord-proxy/blob/main/README.md#%E9%83%A8%E7%BD%B2%E5%88%B0%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0)。基本上来说，Zeabur 中设置必须的环境变量即可：
+
+*   **USER\_AUTHORIZATION**：主动发送消息的 discord 用户的授权密钥(多个请以，分隔)--也就是 Authorization
+*   **BOT\_TOKEN**：监听消息的Bot-Token
+*   **GUILD\_ID**：所有 Bot 所在的服务器ID
+*   **COZE\_BOT\_ID**：由 coze 托管的Bot-ID
+*   **PROXY\_SECRET**：\[可选]接口密钥-修改此行为请求头校验的值(多个请以,分隔)(与openai-API-KEY用法一致)，**推荐使用此环境变量**
+
+11.在 Zeabur 上部署成功之后，**选择在 「Networking」下打开公网访问，并生成一个域名**。然后在你的 NextChat 或者 ChatBox 中**使用这个域名作为你的代理地址**，**密码就是环境变量中设置的 PROXY\_SECRET**。
+
+![](https://note.ihsxu.com/api/imgs/1710951736115.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710949574608.webp)
+
+12.然后我们来测试一下对话及生成图片。
+
+![](https://note.ihsxu.com/api/imgs/1710949662434.webp)
+
+![](https://note.ihsxu.com/api/imgs/1710950023097.webp)
+
+完美～～😄
+
+### 限制
+
+不过这种场景也有一些限制（Coze 对 discord 用户做了标识）：
+
+*   GPT-4 Turbo 128K，每天只能对话 50 次；
+*   GPT-4 8K，每天对话 100 次；
+*   GPT-3.5 16K，每天对话 500 次；
+
+如果想超出这个限制，在这个项目中也提供了方案，感兴趣的朋友快去试试吧！🏃🏃🏃
+
