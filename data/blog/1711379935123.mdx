@@ -1,0 +1,82 @@
+---
+title: 使用 Docker 一键部署可以语音对话的 ChatGPT
+date: 3/26/2024
+tags: [AI]
+draft: false
+summary: 现代化设计的开源 ChatGPT/LLMs 聊天应用与开发框架 支持语音合成、多模态、可扩展的（function call）插件系统 一键免费拥有你自己的 ChatGPT/Gemini/Claude/Ollama 应用
+---
+
+之前已经介绍了两个 ChatGPT 相关的应用了：
+
+*   使用 Docker 一键部署免费 63.8k 的私人 ChatGPT 网页应用
+*   17.6k 的 ChatGPT 客户端，配合免费 API Key，香不可言
+
+那今天为什么又来推荐了呢？因为今天推荐的工具它具有以下特点：
+
+*   支持语音会话
+*   支持插件
+*   支持上传图片
+*   支持本地模型 Ollama
+*   助手市场，也就是一大堆预定义的角色。（最新一个是 24年3月25更新的，社区还是很活跃的）
+
+还有一些其他的特性，我就不多说了，大家感兴趣可以自行了解。接下来就正式介绍今天的主角——**LubeChat**～
+
+![](https://note.ihsxu.com/api/imgs/1711380813093.webp)
+
+> [github 地址](https://github.com/lobehub/lobe-chat)
+
+### 使用 Docker 部署
+
+```bash
+$ docker run -d -p 3210:3210 \
+  -e OPENAI_API_KEY=sk-xxxx \
+  -e OPENAI_PROXY_URL=https://api-proxy.com/v1 \
+  -e ACCESS_CODE=lobe66 \
+  --name lobe-chat \
+  lobehub/lobe-chat
+```
+
+这里要注意的是，在 LubeChat 中 OpenAI 的代理地址后面一定要加 `v1`，不然无法正常使用。
+
+然后我们通过 `ip + 端口(3210)` 的形式就可以访问了：
+
+![](https://note.ihsxu.com/api/imgs/1711381062040.webp)
+
+### 插件
+
+LubeChat 内置了 DALLE 3，也支持安装其他的插件
+
+![](https://note.ihsxu.com/api/imgs/1711383891652.webp)
+
+![](https://note.ihsxu.com/api/imgs/1711383992120.webp)
+
+### 语音会话
+
+简单点说，LobeChat 支持文字转语音（Text-to-Speech，TTS）和语音转文字（Speech-to-Text，STT）技术。
+
+![](https://note.ihsxu.com/api/imgs/1711384199876.webp)
+
+![](https://note.ihsxu.com/api/imgs/1711384643067.webp)
+
+> 这是不是可以直接学英语了？
+
+不过目前来说，要使用语音功能，需要具备两点：
+
+*   使用 https，这是来自浏览器的限制
+*   要将文字转语音好像需要 OpenAI 官方的 key 才行，我这是接入之前搞的 Coze 的代理，所以用不了
+
+### 上传图片
+
+支持上传图片，并且分析图片中的内容。
+
+\
+![](https://note.ihsxu.com/api/imgs/1711384913306.webp)
+
+### 助手市场
+
+通过左侧的菜单进入到市场页面，可以看到上面有很多的预制助手，可以快速帮我们生成对话。
+
+![](https://note.ihsxu.com/api/imgs/1711385015718.webp)
+
+LubeChat 后续还会提供更多强大的功能，也会进一步降低例如语音会话的门槛，相比于其他的类似项目来说很强了。
+
