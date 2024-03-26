@@ -1,6 +1,6 @@
 ---
 title: 使用 Docker 一键部署可以语音对话的 ChatGPT
-date: 3/26/2024
+date: 3/27/2024
 tags: [AI]
 draft: false
 summary: 现代化设计的开源 ChatGPT/LLMs 聊天应用与开发框架 支持语音合成、多模态、可扩展的（function call）插件系统 一键免费拥有你自己的 ChatGPT/Gemini/Claude/Ollama 应用
@@ -16,10 +16,10 @@ summary: 现代化设计的开源 ChatGPT/LLMs 聊天应用与开发框架 支�
 *   支持语音会话
 *   支持插件
 *   支持上传图片
-*   支持本地模型 Ollama
+*   支持 **ChatGPT / Gemini / Claude / Ollama** 应用
 *   助手市场，也就是一大堆预定义的角色。（最新一个是 24年3月25更新的，社区还是很活跃的）
 
-还有一些其他的特性，我就不多说了，大家感兴趣可以自行了解。接下来就正式介绍今天的主角——**LubeChat**～
+还有一些其他的特性，我就不多说了，大家感兴趣可以自行了解。接下来就正式介绍今天的主角——**在 Github 上有 25.1k 的 LubeChat**～
 
 ![](https://note.ihsxu.com/api/imgs/1711380813093.webp)
 
@@ -29,9 +29,9 @@ summary: 现代化设计的开源 ChatGPT/LLMs 聊天应用与开发框架 支�
 
 ```bash
 $ docker run -d -p 3210:3210 \
-  -e OPENAI_API_KEY=sk-xxxx \
-  -e OPENAI_PROXY_URL=https://api-proxy.com/v1 \
-  -e ACCESS_CODE=lobe66 \
+  -e OPENAI_API_KEY=<你自己的 API Key> \
+  -e OPENAI_PROXY_URL=<你的代理地址>/v1 \
+  -e ACCESS_CODE=<自定义访问密码> \
   --name lobe-chat \
   lobehub/lobe-chat
 ```
@@ -41,6 +41,10 @@ $ docker run -d -p 3210:3210 \
 然后我们通过 `ip + 端口(3210)` 的形式就可以访问了：
 
 ![](https://note.ihsxu.com/api/imgs/1711381062040.webp)
+
+如果想要更改配置，可以在左下角的设置中进行修改即可。
+
+![](https://note.ihsxu.com/api/imgs/1711469754265.webp)
 
 ### 插件
 
