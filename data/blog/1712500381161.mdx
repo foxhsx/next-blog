@@ -1,0 +1,80 @@
+---
+title: 使用 Docker 部署 1.6k 的无限制免费 GPT-3.5-Turbo API 服务
+date: 4/7/2024
+tags: [AI]
+draft: false
+summary: 利用免登录 ChatGPT Web 提供的无限制免费 GPT-3.5-Turbo API 服务——FreeGPT35
+---
+
+前两天 OpenAI 不是刚宣布 GPT-3.5 可以免注册访问嘛，紧接着就有大佬在 Github 上开源了一个利用免登录 ChatGPT Web 提供的无限制免费 GPT-3.5-Turbo API 服务——FreeGPT35。
+
+> [Github 地址](https://github.com/missuo/FreeGPT35)
+
+![](https://note.ihsxu.com/api/imgs/1712500952153.webp)
+
+### 使用 Docker 部署
+
+可以使用 Github 的 Docker 镜像：
+
+```bash
+docker run -d --name freegpt35 -p 3040:3040 ghcr.io/missuo/freegpt35
+```
+
+或者也可以使用其他 Docker 镜像仓库：
+
+```bash
+docker run -d --name freegpt35 -p 3040:3040 missuo/freegpt35
+```
+
+启动之后可以在服务器终端进行测试：
+
+```bash
+curl http://127.0.0.1:3040/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer any_string_you_like" \
+  -d '{
+    "model": "gpt-3.5-turbo",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hello!"
+      }
+    ],
+    "stream": true
+    }'
+```
+
+### 使用 Docker Compose 部署
+
+作者有介绍两个不同的 yaml 部署：一个是仅提供 GPT35 服务，另一个是结合 ChatGPT-Next-Web 一起进行部署。
+
+我这边偷个懒，直接选择第二种一起进行部署：
+
+```bash
+mkdir freegpt35 && cd freegpt35
+wget -O compose.yaml https://raw.githubusercontent.com/missuo/FreeGPT35/main/compose_with_next_chat.yaml
+docker compose up -d
+```
+
+部署好之后，我们再来看看如何使用。
+
+### 如何使用
+
+在部署好 GPT35 服务之后，我们可以搭配 ChatGPT-Next-Web、Lobe-Chat等应用来使用它。这里以 ChatGPT-Next-Web 为例。
+
+*   打开 NextWeb 的页面，进入到设置中
+
+![](https://note.ihsxu.com/api/imgs/1712501681718.webp)
+
+*   打开自定义接口，模型服务器选择 OpenAI，接口地址就是「你服务器的 IP + 3040」。API Key 随便写一个，自定义模型写 `-all,+gpt-3.5-turbo`
+
+![](https://note.ihsxu.com/api/imgs/1712501717712.webp)
+
+*   我们新建一个对话进行测试，发现已经成功～
+
+![](https://note.ihsxu.com/api/imgs/1712501751202.webp)
+
+### 注意
+
+⚠️还是同样的问题，因为 OpenAI 的 ChatGPT 其实没 Open（不支持国内的地域），所以大家的服务器选择就得找一些其他 region，否则还是无法使用。
+
