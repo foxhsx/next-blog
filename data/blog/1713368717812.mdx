@@ -1,0 +1,135 @@
+---
+title: 1.8k Star，使用 Docker 将 Kimi Chat 免费接入到自己的 GPT 应用！
+date: 4/21/2024
+tags: [AI,Docker]
+draft: false
+summary: 之前给大家推荐过国产的 Kimi Chat 人工智能会话，它以处理超长文本内容而出道，并以此在国内众多的 AI 产品中脱颖而出。在前段时间他们更是开放了 API 接口，新用户在注册之后会赠送 15 元的免费额度，在用完之后还想继续使用就需要进行购买了。
+---
+
+之前给大家推荐过国产的 Kimi Chat 人工智能会话，它以处理超长文本内容而出道，并以此在国内众多的 AI 产品中脱颖而出。在前段时间他们更是开放了 API 接口，新用户在注册之后会赠送 15 元的免费额度，在用完之后还想继续使用就需要进行购买了。
+
+### 如何申请 Kimi Chat API Key
+
+[API 开发平台地址](https://platform.moonshot.cn/console/info)
+
+![](https://note.ihsxu.com/api/imgs/1713492166326.webp)
+
+我们在 API Key 管理页面点击「新建」创建一个新的 API Key：
+
+![](https://note.ihsxu.com/api/imgs/1713492569768.webp)
+
+在创建好之后会生成一个 key，大家要保存好它，因为只展现一次，如果没记住那就只能删除并重建了：
+
+![](https://note.ihsxu.com/api/imgs/1713492905146.webp)
+
+不过使用 API 调用 Kimi 也有用量限制：
+
+![](https://note.ihsxu.com/api/imgs/1713493171422.webp)
+
+*   并发数：1
+*   TPM（每分钟 Token 数）：32000
+*   RPM（每分钟请求数）：3
+*   TPD（每天 Token 数）：1500000
+
+> 有关速率限制，请参考[官网文档](https://platform.moonshot.cn/docs/intro#速率限制)。
+
+那如果这些赠送额度使用完之后还想继续体（bai）验（piao）要怎么办呢？
+
+### Kimi-free-api
+
+在 Github 上有一个目前 star 数已经达到 1.8k 的 kimi-free-api 项目，我们可以使用它来继续免费体验 Kimi API 的调用之旅。
+
+[Github 地址](https://github.com/LLM-Red-Team/kimi-free-api)
+
+首先，kimi-free-api 支持高速流式输出、支持多轮对话、支持联网搜索、支持长文档解读、支持图像解析，零配置部署，多路token支持，自动清理会话痕迹。
+
+而且与 ChatGPT 接口完全兼容。
+
+其次，该项目作者也声明「**仅限自用，禁止对外提供服务或商用，避免对官方造成服务压力，否则风险自担！**」，毕竟月之暗面也需要有收益，才能维持公司正常运转。
+
+### 如何使用
+
+#### 获取 refresh\_token
+
+1.  获取 refresh\_token：从 [kimi.moonshot.cn](https://gitee.com/link?target=https%3A%2F%2Fkimi.moonshot.cn) 获取 refresh\_token。进入 Kimi Chat 对话界面之后随便发起一个对话，然后 F12 打开浏览器开发者工具，从 Application（应用） > Local Storage（本地存储空间）中找到`refresh_token`的值，这将作为 Authorization 的 Bearer Token 值：`Authorization: Bearer TOKEN`。如果 refresh\_token 是一个数组，就需要将它们通过 `.`号连接起来；
+2.  因为 kimi **限制普通账号每 3 小时内只能进行 30 轮长文本的问答（短文本不限）**，所以对长文本有需求的小伙伴可以通过使用多个账号的 refresh\_token 来避开这个规则；
+
+获取好 refresh\_token 之后，我们就可以进行下一步的项目部署啦～
+
+#### 部署
+
+这里提供了五种部署方式：
+
+*   Docker 部署
+
+```bash
+docker run -it -d --init --name kimi-free-api -p 8000:8000 -e TZ=Asia/Shanghai vinlic/kimi-free-api:latest
+```
+
+*   docker-compose 部署
+
+```yaml
+version: '3'
+
+services:
+  kimi-free-api:
+    container_name: kimi-free-api
+    image: vinlic/kimi-free-api:latest
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=Asia/Shanghai
+```
+
+*   Render 部署
+
+1.  fork本项目到你的github账号下。
+2.  访问 [Render](https://dashboard.render.com/) 并登录你的github账号。
+3.  构建你的 Web Service（New+ -> Build and deploy from a Git repository -> Connect你fork的项目 -> 选择部署区域 -> 选择实例类型为Free -> Create Web Service）。
+4.  等待构建完成后，复制分配的域名并拼接URL访问即可。
+
+> ⚠️注意：**部分部署区域可能无法连接kimi，如容器日志出现请求超时或无法连接（新加坡实测不可用）请切换其他区域部署！** **注意：免费账户的容器实例将在一段时间不活动时自动停止运行，这会导致下次请求时遇到50秒或更长的延迟，建议查看[Render容器保活](https://github.com/LLM-Red-Team/free-api-hub/#Render%E5%AE%B9%E5%99%A8%E4%BF%9D%E6%B4%BB)**
+
+*   Vercel 部署
+
+```bash
+npm i -g vercel --registry http://registry.npmmirror.com
+vercel login
+git clone https://github.com/LLM-Red-Team/kimi-free-api
+cd kimi-free-api
+vercel --prod
+```
+
+> ⚠️注意：请先确保安装了Node.js环境。**Vercel免费账户的请求响应超时时间为10秒，但接口响应通常较久，可能会遇到Vercel返回的504超时错误！**
+
+*   Zeabur 部署
+
+和 Render 部署类似，也是先 fork 项目。或者直接到该项目地址，作者提供了部署的地址。
+
+#### 使用
+
+我们选择使用 docker 进行部署，在部署好之后，我们可以使用一个开源的 AI Chat 项目，比如 NextChat：
+
+1.  在 NextChat 中设置自定义接口，**接口地址为你部署 kimi-free-api 服务的云服务器地址 + 8000 端口**
+2.  将获取到的 **refresh\_token** 作为 **API Key** 填入进去
+3.  **自定义模型名称为 Kimi**
+
+![](https://note.ihsxu.com/api/imgs/1713627763566.webp)
+
+这样我们就可以开始使用了：
+
+![](https://note.ihsxu.com/api/imgs/1713627842541.webp)
+
+### 补充
+
+同时，该作者还提供了其他五个 free-api：
+
+*   阶跃星辰 (跃问StepChat) 接口转API [step-free-api](https://github.com/LLM-Red-Team/step-free-api)
+*   阿里通义 (Qwen) 接口转API [qwen-free-api](https://github.com/LLM-Red-Team/qwen-free-api)
+*   ZhipuAI (智谱清言) 接口转API [glm-free-api](https://github.com/LLM-Red-Team/glm-free-api)
+*   秘塔AI (metaso) 接口转API [metaso-free-api](https://github.com/LLM-Red-Team/metaso-free-api)
+*   聆心智能 (Emohaa) 接口转API [emohaa-free-api](https://github.com/LLM-Red-Team/emohaa-free-api)
+
+感兴趣的小伙伴快去试试吧～
+
