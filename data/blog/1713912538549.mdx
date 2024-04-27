@@ -1,0 +1,98 @@
+---
+title: 没有网络限制！超简单本地部署 Llama3 的方法
+date: 4/27/2024
+tags: [AI]
+draft: false
+summary: 没有网络限制！超简单本地部署 Llama3 的方法
+---
+
+我们利用 LM Studio 这款软件来可视化部署 Llama3。
+
+[官网地址](https://lmstudio.ai/)
+
+![](https://note.ihsxu.com/api/imgs/1713915421808.webp)
+
+选择好对应的操作系统下载安装包，在下载好之后进行安装。在安装好之后我们就可以打开软件并使用了：
+
+![](https://note.ihsxu.com/api/imgs/1713915633501.webp)
+
+我们在中间的输入框部分输入 llama 来搜索并安装 llama 系列的模型，不过在进行搜索时会发现搜索功能失效了：
+
+![](https://note.ihsxu.com/api/imgs/1714147954593.webp)
+
+查阅了一下资料发现是收 hc 的影响导致的：
+
+![](https://note.ihsxu.com/api/imgs/1714143191348.webp)
+
+社区也给出了解决方案：
+
+![](https://note.ihsxu.com/api/imgs/1714143290359.webp)
+
+也就是说如果要搜 Llama3，那么直接搜 lmstudio-community，而如果要搜 Phi，那就搜 microsoft：
+
+![](https://note.ihsxu.com/api/imgs/1714143444341.webp)
+
+不过虽然解决了搜索的问题，但对于大多数小伙伴来说也依然有诸多限制，最大的限制就是网络问题，因为国内无法正常从 Hugging Face 上拉取模型，好多小伙伴可能在这一步就被 block 住了。今天三金给大家介绍一种魔改的方法，通过 hf 镜像站来做到即使在国内也能正常搜索并下载模型！！
+
+### MacOS 系统
+
+我们打开「访达-应用程序-LM Studio」，然后右击 LM Studio 程序，在二级菜单中选中「显示包内容」：
+
+![](https://note.ihsxu.com/api/imgs/1714144234276.webp)
+
+然后我们将里面的文件夹使用 VS Code 或者任意一款编辑器打开：
+
+![](https://note.ihsxu.com/api/imgs/1714144314487.webp)
+
+![](https://note.ihsxu.com/api/imgs/1714144607844.webp)
+
+如上图，以 VS Code 为例：
+
+1.  我们点击编辑器左侧的搜索
+2.  然后在第一个输入框中输入 `huggingface.co`，这会将 LM Studio 程序中所有使用到 `huggingface.co`链接的地方都搜索出来
+3.  紧接着我们在第二个输入框中输入 hf 的镜像网站地址 `hf-mirror.com`，这表示我们将要把所有匹配到的内容都替换为镜像站点的网址
+4.  最后点击右侧的替换按钮进行替换
+
+完成上述四步之后，我们重启 LM Studio 就可以在国内正常进行搜索和下载模型了
+
+![](https://note.ihsxu.com/api/imgs/1714144775630.webp)
+
+### Windows 系统
+
+流程都是一样的，唯一的不同就是文件的存储位置。
+
+1.  在 Windows 系统上安装 LM Studio 时不能指定目录，只会安装到 `C:\Users/[你的 Windows 电脑用户名]\AppData\LM-Studio`
+2.  进入到这个目录之后可以看到你下载的 LM Studio 程序都包含哪些文件，我们以 0.2.21 版本为例，在当前目录下应该会有一个 `app-0.2.21`的文件夹
+3.  通过 VS Code 打开这个文件夹，然后执行之前说的四个步骤将里面的 `huggingface.co` 都替换成 `hf-mirror.com` 即可
+4.  重启 LM Studio 就可以正常使用了
+
+### 选择本地模型开始对话
+
+当我们下载好模型之后，就可以：
+
+1.  点击 LM Studio 左侧菜单中的 AI Chat
+2.  选择刚刚下载好的模型
+3.  开始对话！！
+
+![](https://note.ihsxu.com/api/imgs/1714146599467.webp)
+
+我们先让它来介绍一下自己：
+
+![](https://note.ihsxu.com/api/imgs/1714146726316.webp)
+
+生成回答的速度很快，就是语言还是英文，不过没关系，我们只要让它使用中文回答就可以了：
+
+![](https://note.ihsxu.com/api/imgs/1714146988583.webp)
+
+并且它写代码也贼快：
+
+![](https://note.ihsxu.com/api/imgs/1714147207093.webp)
+
+### 注意
+
+大家在选择模型时，一定要考虑好自己的电脑配置，尤其是 GPU 不太行的电脑，最好不要安装一下子就跑满甚至跑超 CPU 的模型，这样对电脑本身的损耗是非常大的！！
+
+可以通过在 AI Chat 中「选择模型下拉框」左边展示 CPU 的部分来监控使用模型时 CPU 的使用率，如果太大的话建议立即停止，或者通过降低模型精度和分块等方式来减少计算要求。
+
+感兴趣的小伙伴快去试试吧～
+
