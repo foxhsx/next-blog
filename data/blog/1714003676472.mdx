@@ -1,0 +1,126 @@
+---
+title: 使用 4k Star 的 GeminiProChat 部署可国内访问的 Gemini AI
+date: 4/29/2024
+tags: [AI]
+draft: false
+summary: 使用 4k Star 的 GeminiProChat 部署可国内访问的 Gemini AI
+---
+
+之前不是给大家分享过可以通过部署 FreeGPT35 的项目来达到在国内访问 ChatGPT 3.5 的目的嘛，不过近期三金在使用时发现隔一段时间就连不上了，逛了一下社区看到有大佬说是 OpenAI 那边的原因（改了啥代码代码导致的，果然不 Open 啊～🐶）
+
+OpenAI 这样搞的话，访问起来是非常不稳定的，而直接通过科学上网的方式去直连又有被 ban IP 的风险。
+
+无奈之下，三金只能将注意力转移到新的替代方案上，那就是使用 Google 的 Gemini API Key + GeminiProChat + Vercel + 个人域名实现国内直连。
+
+其中 GeminiProChat 是 Github 上的一款开源项目，目前已经拥有 4K 的 Star，它支持使用 Vercel 一键部署（这不就省下了买服务器的钱😏），然后在部署好之后我们可以通过域名解析的方式达到国内直连的效果。
+
+接下来我们就一起来部署一下～
+
+### 1.申请 Gemini API Key
+
+看这篇：[《免费使用谷歌的 Gemini 以及 API Key》](https://blog.ihsxu.com/blog/1711583238882)
+
+### 2.在 Github 上 fork GeminiProChat
+
+> [GeminiProChat Github 地址](https://github.com/babaohuang/GeminiProChat)
+
+![](https://note.ihsxu.com/api/imgs/1714193552017.webp)
+
+### 3.部署到 Vercel
+
+我们可以在第二步中的 GitHub 项目地址中拉到下边的 README.md 部分找到 [Deploy](https://github.com/babaohuang/GeminiProChat?tab=readme-ov-file#deploy)：
+
+![](https://note.ihsxu.com/api/imgs/1714193883358.webp)
+
+点击「Deploy」按钮跳转到 Vercel 的部署页面：
+
+![](https://note.ihsxu.com/api/imgs/1714194045808.webp)
+
+在截图红框圈起来的部分，选择要部署的 GeminiProChat 项目，如果没有找到，说明我们的 Github 账号并没有授权这个仓库给 Vercel，需要点击红框右下角的链接跳转到权限页面去进行授权（拉到最下面）：
+
+![](https://note.ihsxu.com/api/imgs/1714194432512.webp)
+
+授权好之后回到 Vercel 页面，Import 一下 GeminiProChat 项目即可：
+
+![](https://note.ihsxu.com/api/imgs/1714194552344.webp)
+
+在部署之前，我们还需要配置下环境变量，也就是为项目配置 Gemini API Key：
+
+*   在 Environment Variables 折叠框中新增一行配置项，在 Key 中输入 GEMINI\_API\_KEY，然后在 Value 输入框中输入我们申请好的 key，最后点 add 就配置好啦
+
+![](https://note.ihsxu.com/api/imgs/1714195196269.webp)
+
+完成项目 API Key 的配置之后，点击「Deploy」进行部署，等待片刻，看到这个界面的时候表示部署成功啦～～
+
+![](https://note.ihsxu.com/api/imgs/1714194709333.webp)
+
+点击右上角的「Continue to Dashboard」跳转到该项目的概览页面：
+
+![](https://note.ihsxu.com/api/imgs/1714195499915.webp)
+
+红框中的位置是 Vercel 免费提供的一个二级域名，可以通过它来直接访问我们部署好的项目：
+
+![](https://note.ihsxu.com/api/imgs/1714195569155.webp)
+
+来问一下它：
+
+![](https://note.ihsxu.com/api/imgs/1714195604701.webp)
+
+看起来OK，目前还差最后一步域名解析就大功告成了！
+
+> 为什么要进行域名解析，因为上述步骤都得科学访问，只有通过域名解析才能在国内直连
+
+### 4.域名解析
+
+我们以阿里云DNS为例：
+
+*   登录[阿里云 DNS](https://dns.console.aliyun.com/#/dns/domainList)
+*   选择自己的域名（没有就去万网买一个，不需要多贵，能用就行）进入到解析设置页面
+*   点击「添加记录」按钮，添加要解析的域名：
+
+![](https://note.ihsxu.com/api/imgs/1714196398549.webp)
+
+这里有几点需要注意：
+
+1.  记录类型要选 CNAME
+2.  记录值必须是 `cname.vercel-dns.com`
+3.  主机记录就是你的二级域名名称，自定义就行，比如 gemini
+
+其他咱就不用管了，配置完上面的选项之后直接点确定就行。
+
+接下来回到 Vercel 部署好的项目中录入刚刚的二级域名：
+
+*   点击红框部分进入到 Deployment 页面
+
+![](https://note.ihsxu.com/api/imgs/1714196858844.webp)
+
+*   将页面拉到下方找到「Assigning Custom Domains」折叠框，点击「Manage」
+
+![](https://note.ihsxu.com/api/imgs/1714196981781.webp)
+
+*   输入我们刚刚设置的二级域名，比如 gemini.你的domon.com，然后点击 add
+
+![](https://note.ihsxu.com/api/imgs/1714197108480.webp)
+
+等待一两分钟，看到这个信息表示绑定成功了～～
+
+![](https://note.ihsxu.com/api/imgs/1714197201053.webp)
+
+我们来测试一下：
+
+![](https://note.ihsxu.com/api/imgs/1714197239414.webp)
+
+完美打开，搞定！！
+
+### 关于收费
+
+谷歌近期宣布，在 5 月 2 号开始对「在启用了计费项目中有使用到 Gemini  API 的」，将会按量收费。
+
+![](https://note.ihsxu.com/api/imgs/1714231570650.webp)
+
+![](https://note.ihsxu.com/api/imgs/1714231594086.webp)
+
+![](https://note.ihsxu.com/api/imgs/1714231720330.webp)
+
+如果有小伙伴有这种情况，要注意一下哦～
+
