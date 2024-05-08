@@ -1,0 +1,108 @@
+---
+title: 18k star 的开源本地部署大模型利器-Jan，支持启动本地服务
+date: 5/8/2024
+tags: [AI]
+draft: false
+summary: 闭源的 LM Studio 讲过了，这次说说开源的 Jan
+---
+
+在之前《没有网络限制！超简单本地部署 Llama3 的方法》文章中，有介绍了 LM Studio 这款免费软件，总得来说是很好用的，但是它是闭源的，也不知道后面会不会有一些收费之类的政策，所以我们还需要一个随时可以用来替代它的产品——Jan✨✨
+
+[github 地址](https://github.com/janhq/jan)
+
+### 是什么？
+
+Jan 是一个**开源的、可作为 ChatGPT 替代品的客户端产品**，在 Github 上已经斩获 **18k 的 star**，它支持：
+
+1.  **部署本地大模型**：直接在个人电脑上运行 Llama 或 Mistral 等 AI 模型以完成私有化部署。无需互联网连接 - 将所有数据和处理保存在本地。
+2.  **调用远程 API**：支持连接到远程 API，例如 OpenAI、Groq 或 Mistral API。无需高级硬件即可访问 AI 功能，所有处理均在云端处理。
+3.  **100% 离线使用**：哪怕没网，也能流畅使用，一切数据都只保留在个人电脑上。
+4.  **跨平台**：支持 Apple Intel、Linux Debian 和 Windows x64 以及 Apple M 系列。
+5.  **扩展**：属于高级玩儿法，可以自定义 Jan 来满足特定需求。
+
+它的安装及使用十分简单，哪怕是一个 AI 小白，也可以轻松实现在自己电脑上部署本地大模型。接下来让我们一起来看看如何安装它并部署模型吧～
+
+### 安装
+
+*   进入到它的[官网](https://jan.ai/)选择适合自己电脑系统的安装包进行下载（以三金的电脑为例，下载 Mac M 系列可用的安装包进行安装）
+
+![](https://note.ihsxu.com/api/imgs/1715091162948.webp)
+
+*   安装好之后打开 Jan 可以看到它的界面比 LM Studio 更清爽一些，在对话的窗口则都长得差不多
+
+![](https://note.ihsxu.com/api/imgs/1715091382936.webp)
+
+### 部署本地大模型或者调用远端模型
+
+*   刚安装好是没有可用的本地大模型的，我们需要到 Hub 菜单中下载本地大模型或者选择 OpenAI GPT、Grop 这些远端模型来使用（需要设置 API Key）
+
+![](https://note.ihsxu.com/api/imgs/1715091701421.webp)
+
+*   以「Mistral Instruct 7B Q4」模型为例，我们点击 Download 进行下载。这个时候不出意外，下载失败😂，因为它的下载地址是 huggingface 的
+
+![](https://note.ihsxu.com/api/imgs/1715091867889.webp)
+
+#### 修改模型的下载地址
+
+*   莫慌，我们点击左下角的设置，然后选择「Advanced Settings」高级配置，打开「Jan Data Folder」的目录
+
+![](https://note.ihsxu.com/api/imgs/1715092042469.webp)
+
+*   在这个目录中，我们可以看到有一个 models 文件夹，这就是 Jan 用来存放本地大模型的地方，每个大模型下都有一个 model.json 文件，它里面包含了对应模型的一些描述和配置以及下载路径，我们可以修改里面的路径为镜像站的 url，在重启 Jan 之后我们就能顺利下载模型了
+
+![](https://note.ihsxu.com/api/imgs/1715092387150.webp)
+
+将下图红框中选中的 url 替换为 `hf-mirror.com` 即可：
+
+![](https://note.ihsxu.com/api/imgs/1715092511083.webp)
+
+*   还是以 「Mistral Instruct 7B Q4」为例，我们再修改 url 之后再 Download 一下，已经可以正常下载了：
+
+![](https://note.ihsxu.com/api/imgs/1715092704221.webp)
+
+*   三金这里之前就下载好了「Qwen Chat 7B Q4」模型，下载好之后，右侧的 Download 按钮会变成 Use，点击 Use 开始对话
+
+![](https://note.ihsxu.com/api/imgs/1715092891998.webp)
+
+写代码什么的也没啥问题：
+
+![](https://note.ihsxu.com/api/imgs/1715093012633.webp)
+
+#### 调用 OpenAI 的 ChatGPT
+
+除此之外，我们也可以试试使用 OpenAI 的 ChatGPT，以 3.5 为例。因为之前部署过 FreeGPT35，所以也用不到 API Key，直接在「EXTENSIONS-OpenAI Inference Engine」里修改「Chat Completions Endpoint」即可：
+
+![](https://note.ihsxu.com/api/imgs/1715093594077.webp)
+
+> 注意红框后面那半截路径不要丢，不然就没法成功调用
+
+设置好之后回到对话部分，在右侧的模型中选择「Remote-Open AI GPT 3.5 Turbo」开始对话：
+
+![](https://note.ihsxu.com/api/imgs/1715093733293.webp)
+
+成功调通～🎉🎉
+
+### 启动本地服务
+
+点击左下角的「Local API Server」可以启动一个本地服务，这样我们在其他客户端也能访问本地大模型了
+
+![](https://note.ihsxu.com/api/imgs/1715094186274.webp)
+
+> 如上图，一旦启动服务器，我们就无法在 Jan 中进行聊天了，只能通过调用这个服务的方式。
+
+服务启动后，我们可以点击「Stop Server」按钮下的 API Reference 来查看可用的 API 都有哪些，也可以看到左侧的 assistant 菜单已经被禁用（这就是对话菜单）
+
+![](https://note.ihsxu.com/api/imgs/1715094634747.webp)
+
+API Reference 打开之后会列出可用的 API 接口，我们以 `/chat/completion` 为例进行调用：
+
+![](https://note.ihsxu.com/api/imgs/1715094732387.webp)
+
+![](https://note.ihsxu.com/api/imgs/1715094789737.webp)
+
+可以看到还是很丝滑的，如果我们在此基础上，再内网穿透一下，就可以实现外网访问本地大模型了😁
+
+> 有点遗憾的是，Phi-3 模型在三金下载到本地并导入到 Jan 里之后却无法运行起来，看了下 issue 也有人提出了一样的问题，希望后续能支持吧。
+
+今天的分享就到这里了，感兴趣的小伙伴快去试试吧～
+
