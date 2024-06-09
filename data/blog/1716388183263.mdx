@@ -1,0 +1,131 @@
+---
+title: 14.3k star 的开箱即用的 AI 知识库问答系统
+date: 6/10/2024
+tags: [AI]
+draft: false
+summary: FastGPT 部署起来是有一些难度的
+---
+
+之前三金介绍了很多 AI 大模型以及如何编写 AI Prompt 的文章，但从实际应用的维度来看，我们在使用这些 AI 产品时**一般都是将它作为一个搜索引擎来使用的，并没有发挥出它应有的价值**。
+
+为什么这么说呢？
+
+首先，大多数情况下我们只是通过和 AI 对话来获取自己想要的答案，一个标准的、符合预期的回答**往往需要多轮对话才会产生**；
+
+其次，**对于一些实时信息、企业内部资料等数据，无法从此类 AI 应用上获取**；
+
+最后，**单纯通过和 AI 对话来完成一些任务的效率太低，无法很好地发挥 AI 的能力**。
+
+而 FastGPT——一款基于 LLM 大语言模型的知识库问答系统，可以完美地解决上述问题。它提供了**开箱即用的数据处理、模型调用、RAG 检索、可视化 AI 工作流编排**等能力，帮助我们轻松构建复杂的 AI 应用。
+
+目前该项目在 Github 上已经拥有 14.3k 的 Star！
+
+> [github 地址](https://github.com/labring/FastGPT)
+
+![](https://note.ihsxu.com/api/imgs/1717903826640.webp)
+
+### 在线使用
+
+FastGPT 提供了[在线使用地址](https://fastgpt.in/)，目前用户量已经超 9W+。
+
+通过点击「开始使用」进入到登录页面，支持 Google 和 Github 一键登录：
+
+![](https://note.ihsxu.com/api/imgs/1717904200769.webp)
+
+这里三金使用 Github 进行登录，登录后默认进入到应用页面：
+
+![](https://note.ihsxu.com/api/imgs/1717904358078.webp)
+
+在 FastGPT 中，使用 AI 的前提就是需要创建一个应用，否则寸步难行，我们点击右上角的「+ 新建」按钮来创建一个应用：
+
+![](https://note.ihsxu.com/api/imgs/1717904469145.webp)
+
+在创建应用的对话框中有四种类型的应用供我们选择，分别是：
+
+*   简易模版：一个极其简单的 AI 应用，你可以绑定知识库或工具。
+*   对话引导 + 变量：可以在对话开始发送一段提示，或者让用户填写一些内容，作为本次对话的变量
+*   知识库 + 对话引导：每次提问时进行一次知识库搜索，将搜索结果注入 LLM 模型进行参考回答
+*   问题分类 + 知识库：先对用户的问题进行分类，再根据不同类型问题，执行不同的操作
+
+我们选择简易模版创建一个最基础的应用。这个应用只拥有 AI 对话功能，且输出的内容来源于我们选择的 AI 模型（默认是 FastAI-3.5）：
+
+![](https://note.ihsxu.com/api/imgs/1717904695135.webp)
+
+我们还可以在左侧菜单中的「发布应用」里，将该应用通过免登录窗口的方式将其分享给其他小伙伴使用：
+
+![](https://note.ihsxu.com/api/imgs/1717905413499.webp)
+
+只需要动动小手，粘贴复制即可：\
+![](https://note.ihsxu.com/api/imgs/1717905475613.webp)
+
+![](https://note.ihsxu.com/api/imgs/1717905494048.webp)
+
+到这里，对于普通用户来讲已经基本满足日常生活中的大多数需求了。
+
+但是对于一些团队、企业来说，这还远远不够！！
+
+他们的数据是内部的，使用在线的 FastGPT 以及远程的 AI 模型会有数据泄漏的风险。这个时候我们可以选择使用**本地部署的方式 + 本地 AI 大模型**来实现一个完全私有化的 AI 智能应用。
+
+### docker-compose 快速部署
+
+*   下载 `docker-compose.yml`
+
+手动创建一个目录，并下载[配置文件](https://github.com/labring/FastGPT/blob/main/projects/app/data/config.json)和对应版本的 [docker-compose.yml](https://github.com/labring/FastGPT/blob/main/files/docker) 文件(注意，不同向量库版本的文件不一样)。
+
+*   修改 `docker-compose.yml` 环境变量
+
+FastGPT 一共有三个版本：PgVector 版本、Milvus 版本和 Zilliz 版本。
+
+三金这边机器配置不高，所以选择使用默认的 PgVector 版本，这个版本无需修改配置。
+
+*   启动容器
+
+在 `docker-compose.yml` 同级目录下执行。请确保`docker-compose`版本最好在2.17以上，否则可能无法执行自动化命令。
+
+```bash
+# 启动容器
+docker-compose up -d
+# 等待10s，OneAPI第一次总是要重启几次才能连上Mysql
+sleep 10
+# 重启一次oneapi(由于OneAPI的默认Key有点问题，不重启的话会提示找不到渠道，临时手动重启一次解决，等待作者修复)
+docker restart oneapi
+```
+
+*   在 OneAPI 中添加模型
+
+其中 one-api 我们在上一篇文章中介绍过，这里就不多赘述了，感兴趣的朋友可以看这篇[《使用 Docker 部署14.7k stars 的各大 AI 模型 key 分发及接口管理系统》](https://blog.ihsxu.com/blog/1716306111877)。
+
+*   访问 FastGPT
+
+通过 `IP:3000` 的方式访问部署好的应用。登录用户名为 root，密码为 `docker-compose.yml`环境变量里设置的 `DEFAULT_ROOT_PSW`。
+
+登录之后我们可以通过添加知识库的方式，将内部的一些资料上传：
+
+*   新建一个通用知识库
+
+![](https://note.ihsxu.com/api/imgs/1717949049900.webp)
+
+*   在知识库中，导入文件-文本数据集
+
+![](https://note.ihsxu.com/api/imgs/1717949154885.webp)
+
+![](https://note.ihsxu.com/api/imgs/1717949220051.webp)
+
+![](https://note.ihsxu.com/api/imgs/1717949239054.webp)
+
+![](https://note.ihsxu.com/api/imgs/1717949257035.webp)
+
+![](https://note.ihsxu.com/api/imgs/1717949333257.webp)
+
+![](https://note.ihsxu.com/api/imgs/1717949407694.webp)
+
+*   回到应用中添加对应的知识库即可
+
+![](https://note.ihsxu.com/api/imgs/1717949521284.webp)
+
+再次对话时，就会优先从知识库中进行检索了。
+
+感兴趣的小伙伴快去试试吧。
+
+> PS：AI 模型这里我们可以通过部署本地大模型（比如 Ollama）+ One API + FastGPT 实现完全私有化的应用。
+
