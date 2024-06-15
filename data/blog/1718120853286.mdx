@@ -1,0 +1,111 @@
+---
+title: 40.9k star 的 MetaGPT，一个媲美完整开发团队的 AI 智能体
+date: 6/15/2024
+tags: [AI]
+draft: false
+summary: 一个由 AI 组成的开发草台班子
+---
+
+都说世界就是一个巨大的草台班子，而今天在逛 Github 时发现一个 Star 数高达 40.9k 的项目——MetaGPT。
+
+### 介绍
+
+*   它是一个多智能体框架
+*   内部包括了一个完整的软件团队所需的所有角色：**产品经理 / 架构师 / 项目经理 / 工程师**等
+*   可以利用 AI 以软件公司的形式进行工作，只需要输入一句话，就可以自动输出**用户故事 / 竞品分析 / 需求 / 数据结构 / APIs / 文件等**。
+
+以下是官方给出的软件公司多角色示意图：
+
+![](https://note.ihsxu.com/api/imgs/1718429168118.webp)
+
+简单点来说，MetaGPT 可以拓展我们输入的指令并分身成不同的角色来完成需求：
+
+1.  老板：给了一个内容很简短的需求（啪！一拍脑袋，需求来了）
+2.  产品经理：开始需求分析，撰写和修改需求文档
+3.  接下来架构师开始撰写和修改设计、审核产品需求文档以及后续进行 Code Review
+4.  项目经理：要给团队开发编写和分配任务，也需要一起审核产品需求文档、审核设计及 Code Review
+5.  开发工程师：真实牛马开始编写代码、自查代码及对代码进行调试
+6.  QA 质量，我们可以理解为测试，主要负责编写和执行测试用例
+7.  最终齐心协力完成整个需求🎉
+
+那 MateGPT 如何使用呢？我们一起来看看～
+
+### 安装
+
+官方提供了三种安装方式：
+
+*   docker 安装
+*   python 安装
+*   git clone 本地运行
+
+平时我都是喜欢使用 docker 进行安装的，但这次我选择使用 python。
+
+需要注意的是安装 MetaGPT，python 的版本必须在 3.9 以上，如果不知道自己电脑上的 python 版本是多少，我们可以使用 `python3 --version` 来查看。
+
+只要版本合适，我们就可以开始安装 MetaGPT 了：
+
+```bash
+python3 -m pip install metagpt
+```
+
+我们还可以选择安装一些额外的功能，比如:
+
+*   Mermaid：一种使用文本生成流程图、饼图、甘特图和其他图表的语言。可以使用 npm 进行安装：`npm install -g @mermaid-js/mermaid-cli`
+*   pyppeteer：使用pyppeteer + mermaidjs可以将Mermaid文本转换为图表。
+*   ……
+
+### 配置
+
+光安装好还没用，我们在使用时还需要配置对应的大模型，不然没有 AI 支持它也跑不起来。
+
+1.  在当前工作目录中创建一个名为`config`的文件夹，并在其中添加一个名为`config2.yaml`的新文件。
+2.  config2.yaml 中的基础配置是这样的：
+
+```yaml
+llm:
+  api_type: 'openai' # or azure / ollama / groq etc. Check LLMType for more options
+  api_key: 'sk-...' # YOUR_API_KEY
+  model: 'gpt-4-turbo' # or gpt-3.5-turbo
+  # base_url: 'https://api.openai.com/v1'  # or any forward url.
+```
+
+其中：
+
+*   api\_type 就是你现在要选择使用哪个厂商的 AI 大模型
+*   api\_key 就是你的这个 AI 大模型的 API Key
+*   model 就是你要使用的模型名称，比如 gpt-4-turbo
+*   base\_url 就是在 MetaGPT 在运行过程中要访问的 API 地址
+
+### 运行
+
+配置好之后，我们就可以开始使用了，打开终端进入到当前工作目录，然后输入我们将要让 MetaGPT 完成的第一个需求！
+
+```bash
+metagpt "写一个红心"
+```
+
+开始运行起来了：
+
+![](https://note.ihsxu.com/api/imgs/1718460151559.webp)
+
+可以看到有 Alice 这个产品、还有 Bob 架构师以及 Eve 项目经理在一起工作，也有进行一些 Code Review 和重写：
+
+![](https://note.ihsxu.com/api/imgs/1718461132873.webp)
+
+经过短暂的时间之后，项目已经开发完成了：
+
+![](https://note.ihsxu.com/api/imgs/1718461277467.webp)
+
+运行一下子瞅瞅看：`python3 mian.py`
+
+![](https://note.ihsxu.com/api/imgs/1718461477962.webp)
+
+完成！但是吧，这个效果不是我预期的，本来是想画个红心来着，哈哈哈哈～
+
+不过起码算是完成了一整套流程。小伙伴们有兴趣的，可以去 [Github](https://github.com/geekan/MetaGPT) 上下载玩玩儿看😊
+
+### 遇到的坑
+
+1.  因为三金对 python 不熟，升级 python 版本到 3.12 之后运行项目时遇到一个 distutils 的问题，经过长时间的排查，发现是因为版本升的过于高了，3.12 的版本里没有这个 distutils，最后将版本降到 3.11 之后就好了
+2.  使用之前玩儿过的代理进行运行时，一直报错 JSONDecodeError，这个看了下 issue，有大佬说使用付费的 API Key 就 OK。三金换到之前的 gpt-3.5-turbo 模型就好了，不过因为模型不如 gpt-4 等模型，所以一些复杂的需求完成起来够呛。
+
