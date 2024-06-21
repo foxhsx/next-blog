@@ -1,0 +1,99 @@
+---
+title: Docker 部署 30.5k 的 AgentGPT，让 AI 帮你定制计划
+date: 6/21/2024
+tags: [AI]
+draft: false
+summary: 让 AI 来帮助我们制定计划，完成目标吧
+---
+
+大家平常在工作中或者生活中都会或多或少地给自己制定目标，但是制定目标之后**怎么将其分解为一个个小的 case**、**并为这些 case 制定详细的计划**，**最后按照计划加以执行**，这往往是一个比较耗费精力的事情。
+
+而今天要介绍的 AgentGPT，可以轻松地帮大家完成这件事。**AgentGPT 在 Github 上拥有 30.5k stars，是一个非常火的 AI 项目**，官方介绍是这样的：
+
+> 它是一个自主 AI 代理平台，使用户能够直接在浏览器中创建和部署可定制的自主 AI 代理。
+>
+> **只需为您的人工智能代理分配一个名称和目标，然后它就会自动根据目标来进行一系列的操作，最终实现指定的目标。**&#x20;
+>
+> AgentGPT 通过链接对大型语言模型（例如 GPT-4）的调用来实现目标，旨在**理解目标、实施策略并在无需人工干预的情况下交付结果**。
+
+简单点来说（混入三金使用之后的观点）：
+
+1.  通过在 AgentGPT 中输入一个目标
+2.  **AgentGPT 会自动将这个目标进行分析、拆解、定制计划并根据计划一步步完成目标**
+3.  对于一些学习类的场景来说，可以生成一个完整且具备可行性的学习计划，真的很 nice
+
+> [Github 地址](https://github.com/reworkd/AgentGPT)
+
+那么如何使用它呢？这里 AgentGPT 提供了两种使用方式：
+
+*   [官方提供的网址](https://agentgpt.reworkd.ai/)：**每天可以免费使用 5 次**，付费的话每个月 40 刀，提供的能力更多
+*   本地部署：docker 部署和非 docker 部署
+
+### 访问官网
+
+官方提供的页面长这样：
+
+![](https://note.ihsxu.com/api/imgs/1718808604877.webp)
+
+在名称这栏主要是给用户提供自定义 AI 名称的地方，而在目标一栏则是输入想要做的事情，按下回车或者点击左侧的三角按钮之后它就会帮我们完成这个目标。比如我们想要学好 React，熟练掌握它的语法和用法，知道它的一些底层逻辑。
+
+![](https://note.ihsxu.com/api/imgs/1718808957799.webp)
+
+可以看到，在很短的时间内，就列出了 8 个 task，并完成了其中的 5 个，为啥剩下的三个没完成？因为现在使用的是免费的 AgentGPT-3.5，只能支持到这里了，想要完整的功能，请开通付费🐶
+
+而在已完成的这些 task 中，每个 task 都会给出详细的步骤和内容：
+
+![](https://note.ihsxu.com/api/imgs/1718809332774.webp)
+
+![](https://note.ihsxu.com/api/imgs/1718809369856.webp)
+
+不说看完就会吧，起码有个基础的认知，上面也列举了一些学习网站之类的，按照上面制定的计划进行学习，也可以快速上手起来～
+
+### docker 部署
+
+在使用 docker 部署前，我们按照文档提供的步骤，根据不同的系统拉取项目并运行脚本。
+
+#### Mac/Linux
+
+```bash
+git clone https://github.com/reworkd/AgentGPT.git
+cd AgentGPT
+./setup.sh
+```
+
+#### Windows
+
+```bash
+git clone https://github.com/reworkd/AgentGPT.git
+cd AgentGPT
+./setup.bat
+```
+
+在拉取项目之后，我们使用 VSCode 打开 AgentGPT 代码，然后我们需要修改三个点（**否则项目无法正常运行**）：
+
+*   openAI 的 key
+*   openAI 的代理：想在国内玩儿，大家 DDDD 呗
+*   langchain 的版本修改：在项目中 langchain 的版本为 0.0.295，但是 docker 启动后会报错：`No module named 'langchain.globals'`，经搜索之后大佬们给出的方案是将版本改为 0.344
+
+首先改 OpenAI 的 key 需要在 `envGenerator.js` 文件中修改 `REWORKD_PLATFORM_OPENAI_API_KEY` 的值；
+
+![](https://note.ihsxu.com/api/imgs/1718895418557.webp)
+
+其次，在 VSCode 中全局搜索 `https://api.openai.com`，然后将其替换为代理地址：
+
+![](https://note.ihsxu.com/api/imgs/1718895465343.webp)
+
+最后，在 `platform/pyproject.toml` 中修改 `langchain` 的版本为 `0.0.344`。
+
+完成上述修改之后，在 AgentGPT 根目录下执行 `./setup.sh` 启动项目，然后访问 `IP:3000` 即可访问：
+
+![](https://note.ihsxu.com/api/imgs/1718895748197.webp)
+
+测试一下，选中 `CalculusGPT`：
+
+![](https://note.ihsxu.com/api/imgs/1718895812833.webp)
+
+嘎嘎好用！
+
+感兴趣的小伙伴快去试试吧😊
+
