@@ -1,0 +1,60 @@
+---
+title: 中文版斯坦福多智能体AI小镇（二）：开启小镇！
+date: 7/3/2024
+tags: [AI]
+draft: false
+summary: 正式开启 AI 小镇！
+---
+
+在完成安装 Ollama 的步骤之后，我们就可以开始搭建小镇的第二步：拉取斯坦福小镇的开源代码并运行起来！
+
+### 工具准备
+
+因为我们要搭建中文版的 AI 小镇，所以除了使用 Ollama 下载 `qwen2:7b` 模型之外，还需要下载一个模型 `znbang/bge:large-zh-v1.5-q8_0`：
+
+```bash
+ollama pull znbang/bge:large-zh-v1.5-q8_0
+```
+
+然后从 [Github](https://github.com/Steven-Luo/ai-town-cn) 上拉取 AI 小镇的代码并安装依赖：
+
+```bash
+git clone git@github.com:Steven-Luo/ai-town-cn.git
+cd ai-town-cn
+npm install
+```
+
+再拉取 convex 后端代码至同一个目录下：
+
+```bash
+curl  -L -O https://github.com/get-convex/convex-backend/releases/latest/download/convex-local-backend-aarch64-apple-darwin.zip
+unzip convex-local-backend-aarch64-apple-darwin.zip
+```
+
+这里需要注意的是后续我们可能还会使用到 `just`，所以还要安装 just：`brew install just`
+
+> 下载时可能会卡在 `brew update` 上，这时只要设置下 brew 的镜像源就可以
+
+### 启动项目
+
+完成上述步骤之后，我们就可以：
+
+1.  启动 convex 后端：`./convex-local-backend`；在 MacOS 上如果这一步无法顺利执行，那就在访达中找到这个文件，右击选择打开即可
+2.  然后再启动 AI 小镇项目：`npm run dev`
+
+访问 `http://localhost:5173/ai-town`:
+
+![](https://note.ihsxu.com/api/imgs/1719717127855.webp)
+
+### 测试
+
+我们点击「Interact」开始和小镇上的人物开始交互，可以点击脑袋上有气泡或者书籍的小人进行交流：
+
+![](https://note.ihsxu.com/api/imgs/1719717221194.webp)
+
+![](https://note.ihsxu.com/api/imgs/1719717283778.webp)
+
+感兴趣的小伙伴快去试试看吧～
+
+参考文章：[使用Ollama提供的Qwen2 7B搭建自己的中文版斯坦福多智能体AI小镇](https://mp.weixin.qq.com/s/RHxW_2vP0Y8JS6xsTyRJnA)
+
