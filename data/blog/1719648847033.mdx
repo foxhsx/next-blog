@@ -1,0 +1,154 @@
+---
+title: 18.2k 的 fabric，一款通过命令形式预定义 AI prompts 的超强辅助
+date: 7/7/2024
+tags: [AI]
+draft: false
+summary: 通过黑盒的方式，简化 AI 的使用，提高效率
+---
+
+### 介绍
+
+从 AI 问世以来到现在，出现了各式各样的 AI 产品，但是要使用好它们却不是一件简单的事情，因为如今的 AI 大都是通过堆数据训练出来的，它们只能通过接收比较规范、清晰、结构化的 prompt 来给出比较准确的回答，如果输入给 AI 的问题比较模糊，那 AI 也只能输出一个充斥着幻觉的答案。
+
+关于 prompts 之前三金输出过一些文章，有：
+
+*   [OpenAI 官方推出的 AI Prompt 提示词编写公式](https://mp.weixin.qq.com/s?__biz=MzUyODkwNTg3MA==\&mid=2247484754\&idx=1\&sn=4bacc9b5009f9c1618b4fd3468ce99ac\&chksm=fa6866b3cd1fefa5f57fc9f7f1d24bfeb5c4ce2838b364d303708e70933049f748aa3818d052\&token=204606385\&lang=zh_CN#rd)
+*   [CO-STAR，新加坡首届 GPT-4 提示工程大赛冠军的夺冠宝典](https://mp.weixin.qq.com/s?__biz=MzUyODkwNTg3MA==\&mid=2247484741\&idx=1\&sn=d645c723251d4252d9da0b9890c614e0\&chksm=fa6866a4cd1fefb2c7d74b4730cd1e0cb3817e950a65ae9be92d8bf59f09aa870b214c8486fa#rd)
+*   [让 AI 更懂你的 Prompt 提示词宝藏网站-FlowGPT](https://mp.weixin.qq.com/s?__biz=MzUyODkwNTg3MA==\&mid=2247484626\&idx=1\&sn=53c0d832d9947f4289018e5bc67ae6c9\&chksm=fa686733cd1fee2535bdcabc8fa8a18eedfad68b1b7cfbf42262bff56550c97295712c6b7c61#rd)
+
+但是这些也只是在教大家怎么写出一个比较合理规范的 prompt 以及如何查找别人写好的 prompts。
+
+今天给大家介绍的 **fabric，是一款预定义了一系列 AI 提示的开源框架**，**在 Github 上拥有 18.3k star，使用它我们可以通过快捷命令来让 AI 完成任务。**
+
+### 安装
+
+> 在正式开始安装之前，我们要**确保安装了 python 3.10+**，否则 fabric 无法正常运行。
+
+*   创建存放 fabric 项目的目录
+
+```bash
+mkdir fabric
+```
+
+*   从 Github 上克隆项目并进入项目
+
+```bash
+git clone https://github.com/danielmiessler/fabric.git
+cd fabric
+```
+
+*   如果电脑上没有安装 pipx，还需要先安装 pipx
+
+```bash
+# macOS
+brew install pipx
+
+# Linux
+sudo apt install pipx
+
+# windows
+# 使用 WSL，并遵循 Linux 说明
+```
+
+*   安装好 pipx 之后，就可以开始安装项目依赖了
+
+```bash
+pipx install .
+```
+
+*   设置一些必要的配置
+
+```bash
+fabric --setup
+```
+
+这一步其实就是配置一些 AI 的 key 进去，比如 OpenAI、Google 和 YouTube 等。
+
+*   重启终端之后就可以开始使用啦～
+
+### 使用
+
+因为现在 OpenAI 封号挺严重的，三金尝试使用 OpenAI key 的时候已经调不通了，幸运的是 fabric 是支持 Ollama 的（同理，只要是本地大模型应该都是支持的），所以我启动了尘封已久的 Jan（详情请看[18k star 的开源本地部署大模型利器-Jan，支持启动本地服务](http://mp.weixin.qq.com/s?__biz=MzUyODkwNTg3MA==\&mid=2247484607\&idx=1\&sn=7429aeedd2d53b563ad3207d5add86b3\&chksm=fa68675ecd1fee4833470d58daf206160f697191cd6aaedfb56688f8bf269db1b04d7c683e3d\&scene=21#wechat_redirect)）。
+
+> 还有 LM Studio 也可以，参考 [没有网络限制！超简单本地部署 Llama3 的方法](https://mp.weixin.qq.com/s?__biz=MzUyODkwNTg3MA==\&mid=2247484427\&idx=1\&sn=71f8590c6a0147e6974a972e4f0388cb\&chksm=fa6867eacd1feefc7b9cd98f434524d1d84168071f1dcef915a627717d3a935bb88cd0a29fc2\&token=1183145693\&lang=zh_CN#rd)
+
+![](https://note.ihsxu.com/api/imgs/1720277943105.webp)
+
+然后打开终端并设置 `OPENAI_BASE_URL` 和 `DEFAULT_MODEL`：
+
+```bash
+export OPENAI_BASE_URL=http://127.0.0.1:1337/v1/
+export DEFAULT_MODEL="qwen-7b"
+```
+
+如果在使用 fabric 命令时遇到 `'NoneType' object has no attribute 'chat'` 的问题，可以通过设置 `OPENAI_API_KEY`为 `NULL` 来解决：
+
+```bash
+vim ~/.config/fabric/.env
+
+OPENAI_API_KEY="NULL"
+CLAUDE_API_KEY="NULL"
+GOOGLE_API_KEY="NULL"
+# 对于代理地址和默认 model 也可以在这个配置文件中设置
+OPENAI_BASE_URL=http://127.0.0.1:1337/v1/
+DEFAULT_MODEL="qwen-7b"
+```
+
+保存并退出，然后使用 fabric 实验一下：
+
+```bash
+pbpaste | fabric -p create_summary --stream
+```
+
+解释一下：
+
+*   `-p` 也就是 `--pattern`，即选择一个预定义的提示使用
+*   `create_summary`：这个角色是一个内容总结专家，会输出 Markdown 格式的摘要
+*   `--stream`：如果要实时查看结果，就需要用到这个选项
+
+测试成功～
+
+![](https://note.ihsxu.com/api/imgs/1720322309514.webp)
+
+当我们未指定内容时，这个 prompt 会介绍当前大模型，现在我们找一个文件让它来整理总结一下文件里的内容：
+
+```bash
+pbpaste | fabric -t ~/Desktop/2022周末分享/JS\ 代码整洁之道.md -p summarize --stream
+```
+
+> `-t` 就是指定要访问的文件
+
+也可以顺利输出：
+
+![](https://note.ihsxu.com/api/imgs/1720323384558.webp)
+
+除此之外，fabric 还提供了一个 `--gui` 的命令，可以打开一个可视化窗口：
+
+```bash
+fabric --gui
+```
+
+左侧的下拉框是快捷指令，右侧下拉框是 model 类型：
+
+![](https://note.ihsxu.com/api/imgs/1720323491075.webp)
+
+通过这个窗口我们可以快速执行一些任务，比如：
+
+![](https://note.ihsxu.com/api/imgs/1720323808693.webp)
+
+其他的一些命令及提供的预定义提示词，大家可以访问 fabric 的 [Github](https://github.com/danielmiessler/fabric) 地址来进行查看。
+
+![](https://note.ihsxu.com/api/imgs/1720329014325.webp)
+
+![](https://note.ihsxu.com/api/imgs/1720329040759.webp)
+
+fabric 中好玩儿的东西还有很多，像内置的 `yt` 命令可以总结 YouTube 视频的内容、`ts` 命令可以转录音频文件，也可以自定义 prompt 等等，感兴趣的小伙伴快去试试吧～
+
+关注本公众号，了解更多 AI 资讯
+
+![](https://note.ihsxu.com/api/imgs/1720329976011.webp)
+
+为了方便沟通交流，三金也建了一个 AI 交流群，欢迎感兴趣的小伙伴加入～
+
+![](https://note.ihsxu.com/api/imgs/1720330364868.webp)
+
