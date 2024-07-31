@@ -1,0 +1,80 @@
+---
+title: MacOS 部署 Stable Diffusion 实现 AI 绘画自由
+date: 7/31/2024
+tags: [AI]
+draft: false
+summary: 本地搭建 Stable Diffusion 实现 AI 绘画自由！
+---
+
+自从 Coze 的代理失效之后，三金就很久都没玩儿过 AI 绘图了，最近在玩儿 Dify 的时候发现它支持接入 AI 绘图的功能，在工具模块可以接入：
+
+*   DALL - E 2 和 3
+*   Azure DALL-E 绘画
+*   Stable Diffusion
+
+之前在 Coze 中已经尝试过了 DALLE 的画图能力，这次我准备试试 Stable Diffusion，废话不多说，开始部署！
+
+### 准备工作
+
+1.  安装 python，版本的话我是 3.11.9
+2.  拉取 **Stable Diffusion WebUI** 项目代码，[项目地址](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
+
+```bash
+git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui
+```
+
+### 运行项目
+
+进入到拉取好的项目中，执行对应的脚本：
+
+```bash
+cd stable-diffusion-webui
+
+./webui.sh
+```
+
+这里会再拉取一些其他的一些依赖项目，比如：
+
+*   `Stability-AI/stablediffusion`
+*   `Stability-AI/generative-models`
+*   `crowsonkb/k-diffusion`
+
+多个项目加起来体积还是有些大的，所以大家耐心等待一段时间。等这些都拉取好之后，项目就会正常启动啦～
+
+> 大家最好能保持优异的网速，不然容易卡壳
+
+### 汉化一下
+
+启动之后会自动帮我们打开浏览器，并访问本地服务地址：`http://127.0.0.1:7860/`
+
+![](https://note.ihsxu.com/api/imgs/1722265483186.webp)
+
+其实刚开始这个界面是全英文的，三金这是已经做过了汉化。**汉化的方法**也很简单：
+
+*   我们到页面中 **Extensions** 的 Tab 页面，然后选中 **Install from URL**
+
+![](https://note.ihsxu.com/api/imgs/1722265512316.webp)
+
+*   将这个汉化包的地址粘贴进去：`https://github.com/VinsonLaro/stable-diffusion-webui-chinese`，然后点击下方的 Install
+*   下载安装好之后我们**重启一下用户界面**，只有这样才能将刚刚安装的汉化包应用到 Stable Diffusion 中
+
+![](https://note.ihsxu.com/api/imgs/1722265682040.webp)
+
+*   接下来在 **Settings** 的选项卡中，找到「**User Interface-User Interface**」，在这里面的 **Localization** 下拉框中选中「**chinese-and-english-0313**」
+
+![](https://note.ihsxu.com/api/imgs/1722265852032.webp)
+
+*   最后一步，**分别点击上图中的左右两个按钮，先点第一个 Apply settings，再点击 Reload UI 即可完成汉化**。
+
+### 下载模型
+
+到目前为止，项目本身在第一次部署的时候会为我们下载一个 `v1-5-pruned-emaonly.safetensors`，这个模型有 4.3GB 大小，我们可以试试它的效果：
+
+![](https://note.ihsxu.com/api/imgs/1722435182381.webp)
+
+感觉不咋地，换个模型试一下，这次选 **XXMix\_9realisticSDXL** 模型，画一个好看的小姐姐出来：
+
+![](https://note.ihsxu.com/api/imgs/1722436123915.webp)
+
+一个字！好看！！
+
