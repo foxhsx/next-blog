@@ -1,6 +1,6 @@
 ---
 title: 如何将 39.3k 的开源知识库 Dify 接入微信
-date: 7/28/2024
+date: 9/5/2024
 tags: [Ai]
 draft: false
 summary: 将 Dify 接入到微信中
@@ -32,6 +32,24 @@ git clone https://github.com/hanfangyuan4396/dify-on-wechat
 cd dify-on-wechat/
 ```
 
+*   建议使用虚拟环境来启动项目，因为可能出现一些 python 依赖上的冲突，我们可以使用 `venv` 或者 `conda` 创建虚拟环境
+
+其中 venv 是 python 3.3+ 自带的，而 conda 则需要先进行安装。这里以 venv 为例：
+
+```bash
+# 在你要启动的项目目录下，创建虚拟环境
+python3 -m venv myenv
+
+# 激活虚拟环境
+source myenv/bin/activate
+
+# 安装项目依赖
+pip3 install -r requirements.txt
+
+# 然后启动项目
+python3 app.py
+```
+
 *   安装依赖
 
 ```bash
@@ -60,11 +78,17 @@ pip3 install -r requirements-optional.txt # 国内可以在该命令末尾添加
 }
 ```
 
-这里如果你使用的是云服务器进行部署的，那么服务器地址是可以被公网访问的。但是如果是在本地服务器或者电脑部署的，那么就需要一些工具来进行内网穿透，从而才能实现接入微信的功能，否则是无法实现微信与 dify 之间的交互的。
+这里如果你的 Dify 使用的是云服务器进行部署的，那么服务器地址是可以被公网访问的。但是如果是在本地服务器或者电脑部署的，那么就需要一些工具来进行内网穿透，从而才能实现接入微信的功能，否则是无法实现微信与 dify 之间的交互的。
 
 这里大家如果只是测试用，推荐使用 ngork。
 
-*   启动项目，然后扫码登录
+```bash
+ngrok http http://localhost:8686
+```
+
+这样就会生成一个外网环境也可以访问的服务地址，我们将上述配置中的 dify\_api\_base 的地址改为生成的地址即可。
+
+*   启动项目 `python3 app.py`，然后扫码登录
 
 ![](https://note.ihsxu.com/api/imgs/1722008122377.webp)
 
