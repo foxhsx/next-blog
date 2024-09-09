@@ -1,0 +1,159 @@
+---
+title: 使用 29.8k 的 chatgpt-on-wechat 给微信接入 AI
+date: 9/9/2024
+tags: [AI]
+draft: false
+summary: dow 的上游——cow，全称为 chatgpt-on-wechat，一款可以将 AI 对接到微信的强大开源项目
+---
+
+之前三金给大家介绍过使用 dify-on-wechat （下文简称 dow）将 dify 知识库和微信连通起来，但是在 dow 中不知道是三金操作不对还是其他问题，每次开启 tool 工具时就会导致项目重启。
+
+三金为了尝试一下 tool 工具的神奇，找到了 dow 的上游——chatgpt-on-wechat（下文简称 cow）。
+
+> 当然，是否需要开启 tool 看实际需要，如果是要通过 dify 知识库做 AI 智能客服之类的，只使用 dow 即可。
+>
+> chatgpt-on-wechat 项目地址👉：[传送门](https://github.com/zhayujie/chatgpt-on-wechat)
+
+#### 介绍
+
+chatgpt-on-wechat（简称CoW）项目是基于大模型的智能对话机器人，支持
+
+*   微信公众号
+*   企业微信应用
+*   飞书
+*   钉钉接入
+
+它也支持很多的 AI 大模型，比如：
+
+*   GPT3.5/GPT4.0
+*   Claude
+*   Gemini
+*   LinkAI
+*   ChatGLM
+*   KIMI
+*   文心一言
+*   讯飞星火
+*   通义千问
+*   以及第三方中转的 API Key
+
+能处理文本、语音和图片，并通过插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业 AI 应用。
+
+#### 安装
+
+建议 Python 版本在 3.7.1\~3.9.X 之间，推荐3.8版本，3.10及以上版本在 MacOS 可用，其他系统上不确定能否正常运行。
+
+> 如果使用 Docker 或者 Railway 进行项目部署则无需安装 Python 以及下载源码。
+
+##### 1. 下载源码
+
+```bash
+git clone https://github.com/zhayujie/chatgpt-on-wechat
+cd chatgpt-on-wechat/
+```
+
+##### 2. 安装核心依赖--必须安装！！
+
+```bash
+pip3 install -r requirements.txt
+```
+
+##### 3. 安装拓展依赖
+
+如果需要使用 tool 工具，则必须安装此拓展依赖
+
+```bash
+pip3 install -r requirements-optional.txt
+```
+
+##### 4. 配置
+
+在项目根目录下有一个 `config-template.json` 文件，这个是项目的配置文件模板，我们可以复制其内容来创建一个生效的 `config.json` 配置文件：
+
+```bash
+  cp config-template.json config.json
+```
+
+我们大概看下这个文件中的配置项：
+
+```json
+{
+  "model": "gpt-3.5-turbo",                                   # 模型名称, 支持 gpt-3.5-turbo, gpt-4, gpt-4-turbo, wenxin, xunfei, glm-4, claude-3-haiku, moonshot
+  "open_ai_api_key": "YOUR API KEY",                          # 如果使用openAI模型则填入上面创建的 OpenAI API KEY
+  "proxy": "",                                                # 代理客户端的ip和端口，国内环境开启代理的需要填写该项，如 "127.0.0.1:7890"
+  "open_ai_api_base": "",                                     # 如果使用中转 API Key，这里需要配置中转地址
+  "single_chat_prefix": ["bot", "@bot"],                      # 私聊时文本需要包含该前缀才能触发机器人回复
+  "single_chat_reply_prefix": "[bot] ",                       # 私聊时自动回复的前缀，用于区分真人
+  "group_chat_prefix": ["@bot"],                              # 群聊时包含该前缀则会触发机器人回复
+  "group_name_white_list": ["ChatGPT测试群", "ChatGPT测试群2"], # 开启自动回复的群名称列表
+  "group_chat_in_one_session": ["ChatGPT测试群"],              # 支持会话上下文共享的群名称  
+  "image_create_prefix": ["画", "看", "找"],                   # 开启图片回复的前缀
+  "conversation_max_tokens": 1000,                            # 支持上下文记忆的最多字符数
+  "speech_recognition": false,                                # 是否开启语音识别
+  "group_speech_recognition": false,                          # 是否开启群组语音识别
+  "voice_reply_voice": false,                                 # 是否使用语音回复语音
+  "character_desc": "你是基于大语言模型的AI智能助手，旨在回答并解决人们的任何问题，并且可以使用多种语言与人交流。",  # 人格描述
+  # 订阅消息，公众号和企业微信channel中请填写，当被订阅时会自动回复，可使用特殊占位符。目前支持的占位符有{trigger_prefix}，在程序中它会自动替换成bot的触发词。
+  "subscribe_msg": "感谢您的关注！\n这里是ChatGPT，可以自由对话。\n支持语音对话。\n支持图片输出，画字开头的消息将按要求创作图片。\n支持角色扮演和文字冒险等丰富插件。\n输入{trigger_prefix}#help 查看详细指令。",
+  "use_linkai": false,                                        # 是否使用LinkAI接口，默认关闭，开启后可国内访问，使用知识库和MJ
+  "linkai_api_key": "",                                       # LinkAI Api Key
+  "linkai_app_code": ""                                       # LinkAI 应用或工作流code
+}
+```
+
+其中需要关注的几个：
+
+*   `model`：也就是需要使用到的 AI 大模型，默认是 gpt-3.5-turbo；
+*   `open_ai_api_key`：API Key；
+*   `open_ai_api_base`：如果是使用类似 OneAPI 这种中转站上获取的 API Key，就需要填写中转地址了，不然都转发到 OpenAI 去了;
+*   `proxy`：如果使用官方的 API Key，但是又处于国内，就需要使用代理（三金刚开始以为是填写中转地址的地方，但是没用）
+*   `single_chat_prefix`：总不能任何聊天 AI 机器人都回复吧，所以我们需要增加触发机器人回复的命令，比如这个前缀；
+*   `group_chat_prefix`：和上一条一样，唯一不同的是，这个配置是在群聊里生效的。
+
+#### 运行项目
+
+在运行项目之间，三金推荐大家使用 Python 3.3+ 自带的 venv 来创建一个虚拟环境，这样可以有效地防止依赖冲突的问题。比如：
+
+```bash
+# 在你要启动的项目目录下，创建虚拟环境
+python3 -m venv myenv
+
+# 激活虚拟环境
+source myenv/bin/activate
+
+# 安装项目依赖
+pip3 install -r requirements.txt
+
+# 然后启动项目
+python3 app.py
+```
+
+启动项目之后，我们就可以使用微信进行扫码登录了。
+
+![](https://note.ihsxu.com/api/imgs/1725694940639.webp)
+
+在上一篇文章《[使用 dify-on-wechat 中的插件搭建私人助理](https://mp.weixin.qq.com/s?__biz=MzUyODkwNTg3MA==\&mid=2247485369\&idx=1\&sn=566913a7bb22739cebc50bf553f029ab\&chksm=fa686458cd1fed4e39edfddbdb9625eb3c9fd253f69c043bbe8416683c980734f52c0325dd40#rd)》中，我们已经介绍过一些插件了，因为 dow 是 cow 的下游，所以插件上是通用的，cow 中也可以使用它们。
+
+![](https://note.ihsxu.com/api/imgs/1725695263673.webp)
+
+![](https://note.ihsxu.com/api/imgs/1725696011165.webp)
+
+除此之外，我们可以开启 tool 工具：
+
+![](https://note.ihsxu.com/api/imgs/1725696106254.webp)
+
+比如使用 tool 来总结今天的聊天信息：
+
+![](https://note.ihsxu.com/api/imgs/1725696207983.webp)
+
+> 实打实的说，三金能用上的目前来说就这一个命令，其他命令没有插件好用。
+
+也接入 SD 进行画图：
+
+![](https://note.ihsxu.com/api/imgs/1725757579219.webp)
+
+总的来说，给微信接入 AI 之后，可以方便很多事情，平时也不用多开其他程序就可以使用 AI。
+
+尤其是还能将多个 AI 大模型集成进来，不但拥有 AI 都具备的对话功能，还有 AI 搜索及画图功能，将接入 AI 的微信加入群聊，还能做 AI 智能群管理，有需要的小伙伴可以尝试一下～
+
+> ⚠️注意：找一个备用微信进行尝试
+
