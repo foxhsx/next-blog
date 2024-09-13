@@ -1,7 +1,7 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
   title: 'Coder 小站',
-  author: '我是猫',
+  author: '三金得鑫',
   headerTitle: 'Coder 小站',
   description: '记录个人博客，记录学习、成长和一些偶尔冒得泡',
   language: 'en-us',
