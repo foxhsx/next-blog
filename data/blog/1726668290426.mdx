@@ -1,0 +1,104 @@
+---
+title: 部署 4.8k star 的 Xinference 接入本地 Rerank 模型
+date: 9/23/2024
+tags: [AI]
+draft: false
+summary: 有 Ollama 为什么还要部署 Xinference？当然是 Xinference 的过人之处了
+---
+
+首先说说为什么会想要部署 Xinference？
+
+起因是因为前几天白嫖的 Jina API token 用完了，而付费的话又感觉自己的那些知识库没有必要使用商用的（好吧好吧，其实还是舍不得花钱😂），开源免费的对我来说也足够了，所以想要找找可以本地部署的。
+
+刚开始想使用 Ollama 的，不过查了下它好像不支持 Rerank 模型，因此又找上了 Xinference 这款产品。
+
+### 简介
+
+Xorbits Inference (Xinference) 是一个开源平台，用于简化各种 AI 模型的运行和集成。借助 Xinference，我们可以使用任何开源 LLM、嵌入模型和多模态模型在云端或本地环境中运行推理，并创建强大的 AI 应用。
+
+它支持的模型种类有：
+
+*   语言模型：比如 qwen2、baichuan、deepseek、gemma 等场景的语言模型；
+
+<!---->
+
+*   Embedding 模型：有 Jina 的 Embedding 模型（结合 Rerank，知识库检索不就起来了嘛😁）；
+*   Rerank 模型：有 Jina 的 Rerank 模型；
+*   图像模型：除了 Stable Diffusion 之外，还有 Flux 模型；
+*   语音模型：有 ChatTTS 以及 whisper 等等；
+*   视频模型：这类模型还没了解过，Xinference 里是 CogVideoX 模型；
+*   自定义模型：需要先注册，然后才可以在这里看到；
+
+相较于 Ollama 来说，Xinference 在部署之后会为我们提供一个可视化界面，我们可以通过图形化界面安装部署大模型，这个下来会详细进行讲解。
+
+### 部署
+
+官方介绍了三种部署方式，分别是：
+
+*   本地运行：也就是使用终端命令行的方式进行部署，需要 Python 环境；
+*   在集群中部署：对于个人用户来说用不上，虽然现在都在上云，但是 Kubernetes 的使用还是多存在于企业中；
+*   使用 Docker 部署：废话不多说，Run 起来！
+
+在使用 Docker 部署 Xinference 时，如果你的机器有 GPU，可以执行（把 your\_version 改为你想运行的镜像版本，比如 latest）：
+
+```bash
+docker run -e XINFERENCE_MODEL_SRC=modelscope -p 9998:9997 --gpus all xprobe/xinference:<your_version> xinference-local -H 0.0.0.0 --log-level debug
+```
+
+如果是只有 CPU 的机器，则执行：
+
+```bash
+docker run -e XINFERENCE_MODEL_SRC=modelscope -p 9998:9997 xprobe/xinference:<your_version>-cpu xinference-local -H 0.0.0.0 --log-level debug
+```
+
+在启动容器之后，我们访问 `localhost:9998` 就可以看到这样一个页面：
+
+![](https://note.ihsxu.com/api/imgs/1726906268635.webp)
+
+大概介绍一下界面构成：
+
+*   Launch Model：其实就是目前 Xinference 里内置支持的模型，种类繁多，大家自行选择；
+*   Running Models：在 Xinference 中已经下载和运行起来的模型
+*   Register Model：对于 Custom Models 来说，需要先注册，才能运行；
+*   Cluster Information：在这个页面里可以看到项目运行时的资源消耗情况
+
+### 实战：安装 Rerank 模型并集成到 Dify 中
+
+在 RERANK MODELS 中选择一个模型进行部署启动，以 `bce-reranker-base_v1` 为例：
+
+![](https://note.ihsxu.com/api/imgs/1726907217151.webp)
+
+点击左下角的那个小火箭开启下载～
+
+下载好之后，可以到 Running Models 中的 RERANK MODELS 里看到对应的模型：
+
+![](https://note.ihsxu.com/api/imgs/1726907344507.webp)
+
+我们到 Dify 中集成一下 Xinference（在模型供应商的地方）：
+
+![](https://note.ihsxu.com/api/imgs/1726907603224.webp)
+
+因为我们下载的是 Rerank 模型，所以这里「模型类型」为 Rerank 模型；
+
+模型名称和模型 UID 分别填入下图中红框框住的部分（ID --> UID，名称 --> Name）：
+
+![](https://note.ihsxu.com/api/imgs/1726907863198.webp)
+
+服务器 URL 这里填`http://host.docker.internal:9998`，这样写的原因在之前的文章中《[Dify 教程二：使用本地大模型 Ollama](https://mp.weixin.qq.com/s?__biz=MzUyODkwNTg3MA==\&mid=2247485047\&idx=1\&sn=05e09f8ed8c452b42c151a7f67cdb6f7\&chksm=fa686596cd1fec80e020bd0de536f031a966ad06138bba27479d6f6885a915f38490f67ee1fa#rd)》也说过。如果不是 Docker 部署而是本地运行或者集群部署则可以直接写「**服务器 IP：端口号**」。
+
+保存！开测～
+
+在 Dify 中新建一个知识库，并上传数据集（本次上传了《断舍离》这本书进行测试），知识库的检索设置如下：
+
+![](https://note.ihsxu.com/api/imgs/1726908358355.webp)
+
+最终得到 261 个分段，召回测试如下：
+
+![](https://note.ihsxu.com/api/imgs/1726908553222.webp)
+
+我们将这个知识库加到应用中试试看：
+
+![](https://note.ihsxu.com/api/imgs/1726908666366.webp)
+
+效果还不错，感兴趣的小伙伴可以试试看。
+
