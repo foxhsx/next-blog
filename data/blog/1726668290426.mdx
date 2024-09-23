@@ -39,7 +39,7 @@ Xorbits Inference (Xinference) 是一个开源平台，用于简化各种 AI 模
 *   在集群中部署：对于个人用户来说用不上，虽然现在都在上云，但是 Kubernetes 的使用还是多存在于企业中；
 *   使用 Docker 部署：废话不多说，Run 起来！
 
-在使用 Docker 部署 Xinference 时，如果你的机器有 GPU，可以执行（把 your\_version 改为你想运行的镜像版本，比如 latest）：
+在使用 Docker 部署 Xinference 时，如果你的机器有 GPU，可以执行（把 `your_version` 改为你想运行的镜像版本，比如 latest）：
 
 ```bash
 docker run -e XINFERENCE_MODEL_SRC=modelscope -p 9998:9997 --gpus all xprobe/xinference:<your_version> xinference-local -H 0.0.0.0 --log-level debug
@@ -80,7 +80,7 @@ docker run -e XINFERENCE_MODEL_SRC=modelscope -p 9998:9997 xprobe/xinference:<yo
 
 因为我们下载的是 Rerank 模型，所以这里「模型类型」为 Rerank 模型；
 
-模型名称和模型 UID 分别填入下图中红框框住的部分（ID --> UID，名称 --> Name）：
+模型名称和模型 UID 分别填入下图中红框框住的部分（ID 对应 UID，名称对应 Name）：
 
 ![](https://note.ihsxu.com/api/imgs/1726907863198.webp)
 
