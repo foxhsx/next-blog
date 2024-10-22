@@ -1,0 +1,54 @@
+---
+title: 555 star~使用 Docker 部署一款 AI 搜索对话应用
+date: 10/22/2024
+tags: [AI]
+draft: false
+summary: 使用 Docker 部署私人 AI 搜索对话应用
+---
+
+小伙伴们大家好，我是三金～
+
+上一篇文章我们介绍了一下本地开源搜索引擎 SearXNG，将它部署到国外的云服务器上可以实现个人纯享版搜索——无广告！还精准！
+
+那么今天结合 SearXNG 来介绍一款开源的 AI 搜索——search\_with\_ai
+
+> [Github: Search With AI](https://github.com/yokingma/search_with_ai/blob/main/README_CN.md)
+
+这是一款基于 AI 大模型的对话式搜索引擎，服务端基于 Node 开发，前端使用 Vue3 开发。这对于前端同学来说非常友好！而且作者还制作了 Docker 镜像，我们可以使用 Docker 快速进行项目部署。
+
+首页由三个部分组成：
+
+*   一个所有搜索引擎都会有的搜索框
+*   搜索程度和范围
+*   预设问题
+
+![](https://note.ihsxu.com/api/imgs/1729523708513.webp)
+
+搜索时会根据搜索程度的不同（目前可用的是简洁和深入）以及搜索范围的不同（全网和学术）会呈现不一样的结果。
+
+这是简洁版搜索出来的内容：
+
+![](https://note.ihsxu.com/api/imgs/1729524001631.webp)
+
+这是深入版搜索出来的内容（内容过多先放一屏）：
+
+![](https://note.ihsxu.com/api/imgs/1729524758750.webp)
+
+可以明显看到深入版会对搜索结果总结的更加详细，甚至会提供一份 YAML 文件示例。
+
+如果再加上学术搜索，得出的结果会更加完备！
+
+![](https://note.ihsxu.com/api/imgs/1729525116302.webp)
+
+你以为到这里就结束了吗？不，它还可以基于上下文继续进行追问，这也是开头我们介绍到的：这是一款基于基于 AI 大模型的对话式搜索引擎，现在该是测试对话的时候了！
+
+![](https://note.ihsxu.com/api/imgs/1729525497799.webp)
+
+因为 Search With AI 是基于当前上下文继续进行追问，所以如果你提问了上下文以外的内容它就无法进行回答了，而且这个提问的部分字体有些小而且颜色不太容易被看到。
+
+在页面右侧，可以点击设置的图标设置 AI 模型和搜索引擎：
+
+![](https://note.ihsxu.com/api/imgs/1729525871859.webp)
+
+对于搜索引擎而言，SearXNG 可以说是性价比最高的一个，除了免费之外，它里面集成了 70 多个搜索引擎，比单一使用 Bing 或者 Google 会好很多。
+
