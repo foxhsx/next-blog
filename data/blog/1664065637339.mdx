@@ -1,6 +1,6 @@
 ---
 title: JS 代码整洁之道
-date: 8/20/2023
+date: 12/28/2024
 tags: [编程技能]
 draft: false
 summary: 代码整洁之道,JavaScript
@@ -59,6 +59,8 @@ const FIRST_US_PRESIDENT = "George Washington";
 ```
 
 ### 对功能类似的变量名采用统一的命名风格
+
+对于功能类似的变量，我们需要采取统一的命名风格，别人一看就知道这几个变量是属于同一类型的。
 
 **反例**:
 
@@ -120,7 +122,7 @@ saveCityState(city, state);
 
 ### 不要绕太多的弯子
 
-显式优于隐式。
+代码命名中写全变量名，让大家都知道这个变量代表什么。
 
 **反例**:
 
@@ -153,7 +155,7 @@ locations.forEach((location) => {
 
 ### 避免重复的描述
 
-当类/对象名已经有意义时，对其变量进行命名不需要再次重复。
+如果一个类/对象的命名已经有意义时，对其内的属性命名不需要再叠加一些重复内容。
 
 **反例**:
 
@@ -185,6 +187,8 @@ function paintCar(car) {
 
 ### 避免无意义的条件判断
 
+有时候，我们可能更需要逻辑操作符来简化代码：
+
 **反例**:
 
 ```javascript
@@ -210,7 +214,15 @@ function createMicrobrewery(name = 'Hipster Brew Co.') {
 }
 ```
 
+> ⚠️需要注意的是：
+>
+> 在使用逻辑操作符时一定要避免多层嵌套，这样会降低代码的可读性，尤其是在使用三元表达式的时候，还不如直接使用 `if...else` 来实现。
+
 ### 避免使用 UI 来做判断依据
+
+我们一般不会使用 DOM 元素来做判断依据，因为对于一个产品来说 UI 不是固定不变的，它会演进会优化。
+
+且把业务逻辑和 UI 层强耦合在一起，也不是一个合理的做法。
 
 **反例**
 
@@ -305,6 +317,8 @@ function isClientActive(client) {
 
 ### 函数名应明确表明其功能
 
+和上一节的变量命名相似，一个好的函数名称应该让人一眼就知道它的功能是什么，也就是我们经常说的见名知意。
+
 **反例**:
 
 ```javascript
@@ -336,72 +350,130 @@ dateAddMonth(date, 1);
 **反例**:
 
 ```javascript
-function parseBetterJSAlternative(code) {
-  let REGEXES = [
-    // ...
-  ];
+function processOrder(order) {
+  // 这个函数做了太多事情，抽象层次不一致
+  
+  // 验证订单
+  if (!order.items || order.items.length === 0) {
+    throw new Error('Order must have items');
+  }
+  if (!order.userId) {
+    throw new Error('Order must have a user ID');
+  }
 
-  let statements = code.split(' ');
-  let tokens;
-  REGEXES.forEach((REGEX) => {
-    statements.forEach((statement) => {
-      // ...
-    })
+  // 计算总价
+  let total = 0;
+  order.items.forEach(item => {
+    const price = item.price * (1 - item.discount);
+    total += price * item.quantity;
   });
 
-  let ast;
-  tokens.forEach((token) => {
-    // lex...
+  // 检查库存
+  for (let item of order.items) {
+    const stock = getStockLevel(item.id);
+    if (stock < item.quantity) {
+      throw new Error(`Insufficient stock for item ${item.id}`);
+    }
+  }
+
+  // 处理支付
+  const paymentResult = processPayment(order.userId, total);
+  if (!paymentResult.success) {
+    throw new Error('Payment failed');
+  }
+
+  // 更新库存
+  order.items.forEach(item => {
+    updateStock(item.id, item.quantity);
   });
 
-  ast.forEach((node) => {
-    // parse...
-  })
+  return {
+    orderId: generateOrderId(),
+    total: total,
+    status: 'completed'
+  };
 }
 ```
+
+> 反例的写法：
+>
+> *   函数太长，职责太多
+> *   不同的业务逻辑混杂在一起
+> *   难以测试
+> *   难以复用
+> *   难以维护和修改
 
 **正例**:
 
 ```javascript
-function tokenize(code) {
-  let REGEXES = [
-    // ...
-  ];
-
-  let statements = code.split(' ');
-  let tokens;
-  REGEXES.forEach((REGEX) => {
-    statements.forEach((statement) => {
-      // ...
-    })
-  });
-
-  return tokens;
+// 将大函数分解成多个职责单一的小函数
+function validateOrder(order) {
+  if (!order.items || order.items.length === 0) {
+    throw new Error('Order must have items');
+  }
+  if (!order.userId) {
+    throw new Error('Order must have a user ID');
+  }
 }
 
-function lexer(tokens) {
-  let ast;
-  tokens.forEach((token) => {
-    // lex...
-  });
-
-  return ast;
+function calculateTotal(items) {
+  return items.reduce((total, item) => {
+    const price = item.price * (1 - item.discount);
+    return total + (price * item.quantity);
+  }, 0);
 }
 
-function parseBetterJSAlternative(code) {
-  let tokens = tokenize(code);
-  let ast = lexer(tokens);
-  ast.forEach((node) => {
-    // parse...
-  })
+function checkStock(items) {
+  items.forEach(item => {
+    const stock = getStockLevel(item.id);
+    if (stock < item.quantity) {
+      throw new Error(`Insufficient stock for item ${item.id}`);
+    }
+  });
+}
+
+function updateInventory(items) {
+  items.forEach(item => {
+    updateStock(item.id, item.quantity);
+  });
+}
+
+// 主函数现在更清晰，每个步骤都是独立的功能单元
+function processOrder(order) {
+  validateOrder(order);
+  
+  const total = calculateTotal(order.items);
+  
+  checkStock(order.items);
+  
+  const paymentResult = processPayment(order.userId, total);
+  if (!paymentResult.success) {
+    throw new Error('Payment failed');
+  }
+  
+  updateInventory(order.items);
+
+  return {
+    orderId: generateOrderId(),
+    total: total,
+    status: 'completed'
+  };
 }
 ```
+
+> *   **遵循单一职责原则**：每个函数只负责一个具体的任务
+> *   可复用性：比如`calculateTotal`函数可以在其他地方重用
+> *   可测试性：每个小函数都可以独立测试
+> *   可读性：主函数流程清晰，每个步骤的意图明确
+> *   可维护性：如果需要修改某个具体功能，只需要修改对应的小函数即可
 
 ### 移除重复的代码
 
 **永远、永远、永远不要在任何循环下有重复的代码**。
 
-这种做法毫无意义且潜在危险极大。重复的代码意味着逻辑变化时需要对不止一处进行修改。JS 弱类型的特点使得函数拥有更强的普适性。好好利用这一优点吧。
+写重复代码带来的价值是负面的，除了增加冗余之外，就是徒增工作量，就整体来说会带来极大的风险。
+
+比如当重复代码中的逻辑也变更时，肯定是要将所有重复项中的逻辑都修改掉，如果漏掉几个，就会导致结果不一致。
 
 **反例**:
 
@@ -465,6 +537,8 @@ function showList(employees) {
 
 ### 采用默认参数精简代码
 
+为了防止漏传参数带来的 JS 错误，我们可以使用默认参数来增强代码的健壮性。
+
 **反例**:
 
 ```javascript
@@ -482,7 +556,13 @@ function writeForumComment(subject = 'No subject', body = 'No text') {
 }
 ```
 
-### 使用 Object.assign 设置默认对象
+### 使用 Object.assign 或者扩展运算符（...）设置默认对象
+
+为什么建议使用这俩来设置默认对象？
+
+1.  可以浅拷贝，从而不修改原始值
+2.  语法简洁
+3.  可以合并多个对象
 
 **反例**:
 
@@ -562,38 +642,77 @@ function createFile(name) {
 
 ### 避免副作用
 
-当函数产生了除了“接受一个值并返回一个结果”之外的行为时，称该函数产生了副作用。比如写文件、修改全局变量或将你的钱全转给了一个陌生人等。
+React 中的 useEffect Hook 就是用来处理副作用函数的。那么什么是副作用函数？
 
-程序在某些情况下确实需要副作用这一行为，如先前例子中的写文件。**这时应该将这些功能集中在一起，不要用多个函数/类修改某个文件。用且只用一个 service 完成这一需求。**
+在编程领域，当函数产生了除了“接受一个值并返回一个结果”之外的行为时，称该函数产生了副作用。
+
+而我们时常都会遇到这种情况，在某些情况下确实需要副作用这一行为。比较好的做法是将这些功能集中到一起，不要用多个函数/类去修改某个状态。用且只用一个 function 来完成这一需求即可。
 
 **反例**:
 
 ```javascript
-// Global variable referenced by following function.
-// If we had another function that used this name, now it'd be an array and it could break it.
-var name = 'Ryan McDermott';
+// 全局变量
+let userBalance = 1000;
 
-function splitIntoFirstAndLastName() {
-  name = name.split(' ');
+// 多个函数都在修改同一个全局状态，产生了分散的副作用
+function purchaseItem(itemPrice) {
+    userBalance -= itemPrice;
+    return `Purchase successful! New balance: ${userBalance}`;
 }
 
-splitIntoFirstAndLastName();
+function addBonus(amount) {
+    userBalance += amount;
+    return `Bonus added! New balance: ${userBalance}`;
+}
 
-console.log(name); // ['Ryan', 'McDermott'];
+// 使用函数
+purchaseItem(500); // 余额变为500
+addBonus(100);     // 余额变为600
 ```
 
 **正例**:
 
 ```javascript
-function splitIntoFirstAndLastName(name) {
-  return name.split(' ');
+// 将所有状态管理集中在一个服务类中
+class AccountService {
+    constructor(initialBalance) {
+        this.balance = initialBalance;
+    }
+
+    purchaseItem(itemPrice) {
+        if (this.balance >= itemPrice) {
+            this.balance -= itemPrice;
+            return {
+                success: true,
+                newBalance: this.balance,
+                message: `Purchase successful! New balance: ${this.balance}`
+            };
+        }
+        return {
+            success: false,
+            newBalance: this.balance,
+            message: 'Insufficient funds'
+        };
+    }
+
+    addBonus(amount) {
+        this.balance += amount;
+        return {
+            success: true,
+            newBalance: this.balance,
+            message: `Bonus added! New balance: ${this.balance}`
+        };
+    }
+
+    getBalance() {
+        return this.balance;
+    }
 }
 
-var name = 'Ryan McDermott'
-var newName = splitIntoFirstAndLastName(name);
-
-console.log(name); // 'Ryan McDermott';
-console.log(newName); // ['Ryan', 'McDermott'];
+// 使用服务类
+const account = new AccountService(1000);
+account.purchaseItem(500); // 通过服务类管理状态
+account.addBonus(100);     // 通过服务类管理状态
 ```
 
 ### 不要写全局函数
@@ -708,6 +827,8 @@ var totalOutput = programmerOutput
 
 ### 封装判断条件
 
+不要让你的逻辑判断条件拥挤在一个小括号内。
+
 **反例**:
 
 ```javascript
@@ -729,6 +850,8 @@ if (shouldShowSpinner(fsmInstance, listNodeInstance)) {
 ```
 
 ### 避免“否定情况”的判断
+
+尽量使用正向的逻辑思维，避免逆向判断。
 
 **反例**:
 
@@ -760,7 +883,7 @@ if (isDOMNodePresent(node)) {
 
 大多人听到这的第一反应是：“怎么可能不用 if 完成其他功能呢？”。其实在许多情况下通过使用多态(polymorphism)可以达到同样的目的。
 
-第二个问题在于采用这种方式的原因是什么。答案是我们之前提到过的：保持函数功能的单一性。
+第二个问题在于采用这种方式的原因是什么。答案是我们之前提到过的：**保持函数功能的单一性**。
 
 **反例**:
 
@@ -891,6 +1014,8 @@ for (var i = 0; i < list.length; i++) {
 
 不再被调用的代码应及时删除。
 
+> 虽然现在的构建打包工具都会通过 Tree Shaking 来移除掉无用代码，但是那只是在打包构建中，源代码中依旧存在。
+
 **反例**:
 
 ```javascript
@@ -923,14 +1048,16 @@ inventoryTracker('apples', req, 'www.inventory-awesome.io');
 
 JS 没有接口或类型，因此实现这一模式是很困难的，因为我们并没有类似 `public` 和 `private` 的关键词。
 
+> 这里再次提出使用 TypeScript 的优势！！在 TypeScript 中不但有 public 和 private 关键词，还有 protected 关键词。
+
 然而，使用 getters 和 setters 获取对象的数据远比直接使用点操作符具有优势。为什么呢？
 
-1.  当需要对获取的对象属性执行额外操作时。
-2.  执行 `set` 时可以增加规则对要变量的合法性进行判断。
-3.  封装了内部逻辑。
-4.  在存取时可以方便的增加日志和错误处理。
-5.  继承该类时可以重载默认行为。
-6.  从服务器获取数据时可以进行懒加载。
+1.  可以在获取或设置属性时执行额外的逻辑操作
+2.  可以在 setter 中添加数据验证规则，确保属性值的合法性
+3.  提供了更好的封装性，隐藏了内部实现细节
+4.  便于添加日志记录和错误处理机制
+5.  支持在继承时重写（override）默认行为
+6.  支持延迟加载（lazy loading），特别是在处理远程数据时
 
 **反例**:
 
