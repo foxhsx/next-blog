@@ -18,7 +18,7 @@ summary: 增强版 JinaSum 插件，支持手动触发、追问以及群聊黑�
 增强后的插件就群聊可以：
 
 *   可以关闭自动触发，在卡片后面输入「总结」之后手动触发总结；
-*   对于纯链接，可以通过「总计 <链接>」的方式触发总结；
+*   对于纯链接，可以通过「总计 `<链接>`」的方式触发总结；
 *   可以在总结后五分钟内进行追问；
 *   对于自动触发开启的场景，可以单独设置群聊黑名单，确保在指定群聊中不会自动触发链接总结。
 
@@ -46,8 +46,9 @@ summary: 增强版 JinaSum 插件，支持手动触发、追问以及群聊黑�
 
 进到 `dify-on-wechat` 下的 `plugins/jina_sum` 目录下，执行：
 
-```bash
+```
 cp config.json.template config.json
+
 ```
 
 配置上比原版的多了 3 个配置项：
@@ -58,7 +59,7 @@ cp config.json.template config.json
 
 默认配置如下：
 
-```json
+```
 {
   "jina_reader_base": "https://r.jina.ai",           # jina reader链接，默认为https://r.jina.ai
   "open_ai_api_base": "https://api.openai.com/v1",   # chatgpt chat url
@@ -72,6 +73,7 @@ cp config.json.template config.json
   "qa_trigger": "问",                               # 追问触发词
   "black_group_list": [],                          # 群聊黑名单
 }
+
 ```
 
 这里特别提醒一下小白朋友们，AI 的 url 链接和 API Key 一定要填写自己的 key 和代理 url，国内无法直连 OpenAI 官方的！！
